@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Jogador {
+  id             Int       @id @default(autoincrement())
+  nome           String    @db.VarChar(100)
+  posicao        String    @db.VarChar(3)
+  agilidade      Int
+  idade          Int
+  valor_base     Decimal   @db.Decimal(6, 2)
+  condicao       String    @db.VarChar(20)
+  clube_id       Int?
+  velocidade     Int
+  finalizacao    Int
+  passe          Int
+  drible         Int
+  defesa         Int
+  fisico         Int
+  potencial      Int
+  excluido_em    DateTime? @db.Timestamp(6)
+  criado_em      DateTime  @default(now()) @db.Timestamp(6)
+  atualizado_em  DateTime  @updatedAt @db.Timestamp(6)
+
+  clube          Clube?       @relation(fields: [clube_id], references: [id])
+  contratos      Contrato[]
+  transacoes     Transacao[]
+  escalacao      Escalacao?
+  duelos_ataque  DueloPartida[] @relation("Atacante")
+  duelos_defesa  DueloPartida[] @relation("Defensor")
+
+  @@map("jogadores")
+}
+
+model Clube {
+  id              Int       @id @default(autoincrement())
+  nome            String    @unique @db.VarChar(60)
+  nome_normalizado String   @unique @db.VarChar(60)
+  sigla           String    @unique @db.Char(3)
+  caixa           Decimal   @default(300.00) @db.Decimal(10, 2)
+  formacao        String?   @db.VarChar(5)
+  criado_em       DateTime  @default(now()) @db.Timestamp(6)
+
+  jogadores       Jogador[]
+  contratos       Contrato[]
+  transacoes      Transacao[]
+  escalacoes      Escalacao[]
+  partidas_mandante  Partida[] @relation("Mandante")
+  partidas_visitante Partida[] @relation("Visitante")
+  duelos_atacante    DueloPartida[]
+
+  @@map("clubes")
+}
+
+model Contrato {
+  id            Int       @id @default(autoincrement())
+  jogador_id    Int
+  clube_id      Int
+  valor_compra  Decimal   @db.Decimal(6, 2)
+  fidelidade_ate DateTime @db.Timestamp(6)
+  situacao      String    @db.VarChar(12)
+  iniciado_em   DateTime  @db.Timestamp(6)
+  encerrado_em  DateTime? @db.Timestamp(6)
+
+  jogador       Jogador @relation(fields: [jogador_id], references: [id])
+  clube         Clube   @relation(fields: [clube_id], references: [id])
+
+  @@map("contratos")
+}
+
+model Transacao {
+  id              Int       @id @default(autoincrement())
+  clube_id        Int
+  jogador_id      Int
+  nome_jogador    String    @db.VarChar(100)
+  tipo            String    @db.VarChar(6)
+  valor           Decimal   @db.Decimal(6, 2)
+  taxa            Decimal   @db.Decimal(6, 2)
+  multa           Decimal   @db.Decimal(6, 2)
+  lucro           Decimal?  @db.Decimal(7, 2)
+  variacao_caixa  Decimal   @db.Decimal(8, 2)
+  criado_em       DateTime  @default(now()) @db.Timestamp(6)
+
+  clube           Clube   @relation(fields: [clube_id], references: [id])
+  jogador         Jogador @relation(fields: [jogador_id], references: [id])
+
+  @@map("transacoes")
+}
+
+model Escalacao {
+  clube_id   Int
+  jogador_id Int       @unique
+  criado_em  DateTime  @default(now()) @db.Timestamp(6)
+
+  clube      Clube   @relation(fields: [clube_id], references: [id])
+  jogador    Jogador @relation(fields: [jogador_id], references: [id])
+
+  @@id([clube_id, jogador_id])
+  @@map("escalacoes")
+}
+
+model Partida {
+  id                  Int       @id @default(autoincrement())
+  mandante_id         Int
+  visitante_id        Int
+  gols_mandante       Int
+  gols_visitante      Int
+  formacao_mandante   String    @db.VarChar(5)
+  formacao_visitante  String    @db.VarChar(5)
+  jogada_em           DateTime  @default(now()) @db.Timestamp(6)
+
+  mandante            Clube @relation("Mandante", fields: [mandante_id], references: [id])
+  visitante           Clube @relation("Visitante", fields: [visitante_id], references: [id])
+  duelos              DueloPartida[]
+
+  @@map("partidas")
+}
+
+model DueloPartida {
+  id                  Int       @id @default(autoincrement())
+  partida_id          Int
+  ordem               Int
+  clube_atacante_id   Int
+  atacante_id         Int
+  defensor_id         Int
+  nome_atacante       String    @db.VarChar(100)
+  nome_defensor       String    @db.VarChar(100)
+  posicao_atacante    String    @db.VarChar(3)
+  posicao_defensor    String    @db.VarChar(3)
+  condicao_atacante   String    @db.VarChar(20)
+  condicao_defensor   String    @db.VarChar(20)
+  atributo_ataque     String    @db.VarChar(10)
+  atributo_defesa     String    @db.VarChar(10)
+  valor_ataque        Int
+  valor_defesa        Int
+  gol                 Boolean
+
+  partida             Partida @relation(fields: [partida_id], references: [id])
+  clube_atacante      Clube   @relation(fields: [clube_atacante_id], references: [id])
+  atacante            Jogador @relation("Atacante", fields: [atacante_id], references: [id])
+  defensor            Jogador @relation("Defensor", fields: [defensor_id], references: [id])
+
+  @@unique([partida_id, ordem])
+  @@map("duelos_partida")
+}
