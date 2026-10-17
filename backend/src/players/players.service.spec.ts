@@ -1,4 +1,4 @@
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PlayersService } from './players.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,11 +14,11 @@ describe('PlayersService', () => {
           provide: PrismaService,
           useValue: {
             player: {
-              findMany: jest.fn(),
-              findUnique: jest.fn(),
-              create: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
+              findMany: vi.fn(),
+              findUnique: vi.fn(),
+              create: vi.fn(),
+              update: vi.fn(),
+              delete: vi.fn(),
             },
           },
         },

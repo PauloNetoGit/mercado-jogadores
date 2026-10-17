@@ -166,35 +166,45 @@ export class PlayersService {
     id: number,
     condition: 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE',
   ) {
-    const player = await this.prisma.jogador.findFirst({
-      where: {
-        id,
-        excluido_em: null,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const player = await tx.jogador.findFirst({
+        where: {
+          id,
+          excluido_em: null,
+        },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Jogador não encontrado.');
+      }
+
+      if (
+        player.condicao === 'DOENTE' &&
+        condition === 'APTO'
+      ) {
+        throw new ConflictException(
+          'Um jogador doente não pode passar diretamente para APTO.',
+        );
+      }
+
+      // Um titular doente precisa sair da escalação na mesma operação
+      // em que sua condição é alterada, para não deixar uma escalação inválida.
+      if (condition === 'DOENTE') {
+        await tx.escalacao.deleteMany({
+          where: { jogador_id: id },
+        });
+      }
+
+      const updated = await tx.jogador.update({
+        where: { id },
+        data: { condicao: condition },
+      });
+
+      return {
+        id: updated.id,
+        condition: updated.condicao,
+      };
     });
-
-    if (!player) {
-      throw new NotFoundException('Jogador não encontrado.');
-    }
-
-    if (
-      player.condicao === 'DOENTE' &&
-      condition === 'APTO'
-    ) {
-      throw new ConflictException(
-        'Um jogador doente não pode passar diretamente para APTO.',
-      );
-    }
-
-    const updated = await this.prisma.jogador.update({
-      where: { id },
-      data: { condicao: condition },
-    });
-
-    return {
-      id: updated.id,
-      condition: updated.condicao,
-    };
   }
 
   async findAll(
@@ -506,27 +516,40 @@ export class PlayersService {
   }
 
   async remove(id: number) {
-    const player = await this.prisma.jogador.findFirst({
-      where: {
+    return this.prisma.$transaction(async (tx) => {
+      const player = await tx.jogador.findFirst({
+        where: {
+          id,
+          excluido_em: null,
+        },
+      });
+
+      if (!player) {
+        throw new NotFoundException('Jogador não encontrado.');
+      }
+
+      if (player.clube_id !== null) {
+        throw new ConflictException(
+          'Não é permitido excluir um jogador vinculado a um clube. Venda o jogador antes de excluí-lo.',
+        );
+      }
+
+      // Evita deixar uma referência de escalação apontando para jogador excluído.
+      await tx.escalacao.deleteMany({
+        where: { jogador_id: id },
+      });
+
+      await tx.jogador.update({
+        where: { id },
+        data: {
+          excluido_em: new Date(),
+        },
+      });
+
+      return {
+        message: 'Jogador excluído com sucesso.',
         id,
-        excluido_em: null,
-      },
+      };
     });
-
-    if (!player) {
-      throw new NotFoundException('Jogador não encontrado.');
-    }
-
-    await this.prisma.jogador.update({
-      where: { id },
-      data: {
-        excluido_em: new Date(),
-      },
-    });
-
-    return {
-      message: 'Jogador excluído com sucesso.',
-      id,
-    };
   }
 }
