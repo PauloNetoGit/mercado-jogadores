@@ -41,6 +41,16 @@ export class QueryPlayersDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  club_id?: number;
+
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  free?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   page = 1;
 
   @IsOptional()
@@ -58,6 +68,8 @@ export class QueryPlayersDto {
     'base_value',
     'potential',
     'created_at',
+    'market_value',
+    'position',
   ])
   sort_by = 'name';
 

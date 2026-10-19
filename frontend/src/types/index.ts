@@ -11,6 +11,29 @@ export interface Contrato {
   penalty_rate?: number;
 }
 
+export type OrdenacaoJogadores =
+  | "name"
+  | "value_asc"
+  | "value_desc"
+  | "age_asc"
+  | "age_desc"
+  | "position";
+
+export interface FiltrosJogadores {
+  search?: string;
+  position?: Posicao;
+  condition?: Condicao;
+  free?: boolean;
+  club_id?: number;
+  min_age?: number;
+  max_age?: number;
+  min_value?: number;
+  max_value?: number;
+  sort?: OrdenacaoJogadores;
+  page?: number;
+  limit?: number;
+}
+
 export interface Jogador {
   id: number;
   name: string;
@@ -48,6 +71,7 @@ export interface RespostaPaginada<T> {
     page: number;
     limit: number;
     total_items: number;
+    total?: number;
     total_pages: number;
   };
 }

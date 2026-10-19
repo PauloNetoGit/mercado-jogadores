@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from "react";
+import { api } from "@/src/services/api";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   Users,
   User,
@@ -17,59 +18,140 @@ import {
   ShoppingCart,
   Tag,
   History,
-} from 'lucide-react';
+} from "lucide-react";
 
 const modules = [
   {
-    n: '01',
-    title: 'Jogadores',
+    n: "01",
+    title: "Jogadores",
     icon: Users,
-    text: 'Nascem livres e Apto; o valor de mercado vem da condição, agilidade e idade.',
+    text: "Nascem livres e Apto; o valor de mercado vem da condição, agilidade e idade.",
   },
   {
-    n: '02',
-    title: 'Clubes',
+    n: "02",
+    title: "Clubes",
     icon: Shield,
-    text: 'Começam com 300,00 em caixa e sem jogadores.',
+    text: "Começam com 300,00 em caixa e sem jogadores.",
   },
   {
-    n: '03',
-    title: 'Compra',
+    n: "03",
+    title: "Compra",
     icon: ShoppingCart,
-    text: 'Valor + taxa, até 50% do caixa, com contrato de fidelidade.',
+    text: "Valor + taxa, até 50% do caixa, com contrato de fidelidade.",
   },
   {
-    n: '04',
-    title: 'Venda',
+    n: "04",
+    title: "Venda",
     icon: Tag,
-    text: 'Multa antes do fim da fidelidade e comissão sobre o lucro.',
+    text: "Multa antes do fim da fidelidade e comissão sobre o lucro.",
   },
   {
-    n: '05',
-    title: 'Histórico',
+    n: "05",
+    title: "Histórico",
     icon: History,
-    text: 'Toda compra e venda fica registrada, com totais e CSV.',
+    text: "Toda compra e venda fica registrada, com totais e CSV.",
   },
   {
-    n: '06',
-    title: 'Liga',
+    n: "06",
+    title: "Liga",
     icon: Trophy,
-    text: 'Escale 5 titulares e jogue partidas que entram na classificação.',
+    text: "Escale 5 titulares e jogue partidas que entram na classificação.",
   },
 ];
+
+type Player = {
+  id: number;
+  name: string;
+  club_id: number | null;
+};
+
+type PlayersResponse = {
+  data: Player[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+  };
+};
+
+type Club = {
+  id: number;
+  name: string;
+};
+
+type Match = {
+  id: number;
+};
+
+type DashboardData = {
+  players: number;
+  freePlayers: number;
+  clubs: number;
+  matches: number;
+};
 
 export default function Home() {
   const router = useRouter();
 
+  const [dashboard, setDashboard] = useState<DashboardData>({
+    players: 0,
+    freePlayers: 0,
+    clubs: 0,
+    matches: 0,
+  });
+
+  const [dashboardError, setDashboardError] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadDashboard() {
+      try {
+        const [playersResponse, clubsResponse, matchesResponse] =
+          await Promise.all([
+            api.get<PlayersResponse>("/players"),
+            api.get<Club[]>("/clubs"),
+            api.get<Match[]>("/matches"),
+          ]);
+
+        if (!active) return;
+
+        setDashboard({
+          players: playersResponse.meta.total,
+          freePlayers: playersResponse.data.filter(
+            (player) => player.club_id === null,
+          ).length,
+          clubs: clubsResponse.length,
+          matches: matchesResponse.length,
+        });
+
+        setDashboardError(false);
+      } catch (error) {
+        console.error("Erro ao carregar os dados iniciais:", error);
+
+        if (active) {
+          setDashboardError(true);
+        }
+      }
+    }
+
+    loadDashboard();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   // Atalho: redireciona ao pressionar "Enter"
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        router.push('/jogadores');
+      if (e.key === "Enter") {
+        router.push("/jogadores");
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [router]);
 
   return (
@@ -88,21 +170,62 @@ export default function Home() {
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Linha central e círculo do meio */}
-            <line x1="500" y1="0" x2="500" y2="600" vectorEffect="non-scaling-stroke" />
-            <circle cx="500" cy="300" r="95" vectorEffect="non-scaling-stroke" />
+            <line
+              x1="500"
+              y1="0"
+              x2="500"
+              y2="600"
+              vectorEffect="non-scaling-stroke"
+            />
+            <circle
+              cx="500"
+              cy="300"
+              r="95"
+              vectorEffect="non-scaling-stroke"
+            />
             <circle cx="500" cy="300" r="2" fill="#d1d5db" stroke="none" />
 
             {/* Grande área esquerda */}
-            <rect x="0" y="150" width="140" height="300" vectorEffect="non-scaling-stroke" />
-            <rect x="0" y="228" width="50" height="144" vectorEffect="non-scaling-stroke" />
+            <rect
+              x="0"
+              y="150"
+              width="140"
+              height="300"
+              vectorEffect="non-scaling-stroke"
+            />
+            <rect
+              x="0"
+              y="228"
+              width="50"
+              height="144"
+              vectorEffect="non-scaling-stroke"
+            />
             <circle cx="100" cy="300" r="2" fill="#d1d5db" stroke="none" />
-            <path d="M 140 250 A 70 70 0 0 1 140 350" vectorEffect="non-scaling-stroke" />
+            <path
+              d="M 140 250 A 70 70 0 0 1 140 350"
+              vectorEffect="non-scaling-stroke"
+            />
 
             {/* Grande área direita */}
-            <rect x="860" y="150" width="140" height="300" vectorEffect="non-scaling-stroke" />
-            <rect x="950" y="228" width="50" height="144" vectorEffect="non-scaling-stroke" />
+            <rect
+              x="860"
+              y="150"
+              width="140"
+              height="300"
+              vectorEffect="non-scaling-stroke"
+            />
+            <rect
+              x="950"
+              y="228"
+              width="50"
+              height="144"
+              vectorEffect="non-scaling-stroke"
+            />
             <circle cx="900" cy="300" r="2" fill="#d1d5db" stroke="none" />
-            <path d="M 860 250 A 70 70 0 0 0 860 350" vectorEffect="non-scaling-stroke" />
+            <path
+              d="M 860 250 A 70 70 0 0 0 860 350"
+              vectorEffect="non-scaling-stroke"
+            />
           </svg>
         </div>
 
@@ -134,9 +257,21 @@ export default function Home() {
             {/* Badge Liga Fictícia */}
             <div className="mt-6 flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50/80 px-3.5 py-1 text-xs">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-              <strong className="font-medium text-gray-900">Liga Fictícia 2026</strong>
+              <strong className="font-medium text-gray-900">
+                Liga Fictícia 2026
+              </strong>
               <span className="text-[#726871]">·</span>
-              <span className="text-[#726871]">nenhuma partida ainda</span>
+              <span className="text-[#726871]">
+                {dashboardError
+                  ? "dados indisponíveis"
+                  : dashboard.matches === 0
+                    ? "nenhuma partida ainda"
+                    : `${dashboard.matches} ${
+                        dashboard.matches === 1
+                          ? "partida registrada"
+                          : "partidas registradas"
+                      }`}
+              </span>
             </div>
 
             {/* Título Principal */}
@@ -146,8 +281,9 @@ export default function Home() {
 
             {/* Subtítulo */}
             <p className="mt-3 max-w-[630px] text-base leading-6 text-[#686872]">
-              Cadastre jogadores, monte os clubes e negocie com contrato de fidelidade. Depois,
-              escale os titulares e jogue partidas com placar calculado pelos atributos.
+              Cadastre jogadores, monte os clubes e negocie com contrato de
+              fidelidade. Depois, escale os titulares e jogue partidas com
+              placar calculado pelos atributos.
             </p>
 
             {/* Botão de Iniciar com atalho Enter */}
@@ -160,7 +296,7 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <span className="text-sm text-gray-400">
-                ou tecle{' '}
+                ou tecle{" "}
                 <kbd className="rounded border border-gray-300 bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600">
                   Enter
                 </kbd>
@@ -171,22 +307,34 @@ export default function Home() {
             <div className="mt-8 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-gray-500">
               <div className="flex items-center gap-1.5">
                 <Users className="h-3.5 w-3.5 text-gray-400" />
-                <span><strong className="font-medium text-gray-800">23</strong> jogadores</span>
+                <span>
+                  <strong className="font-medium text-gray-800">{dashboard.players}</strong>{" "}
+                  jogadores
+                </span>
               </div>
               <span className="text-gray-300">·</span>
               <div className="flex items-center gap-1.5">
                 <User className="h-3.5 w-3.5 text-gray-400" />
-                <span><strong className="font-medium text-gray-800">7</strong> livres</span>
+                <span>
+                  <strong className="font-medium text-gray-800">{dashboard.freePlayers}</strong>{" "}
+                  livres
+                </span>
               </div>
               <span className="text-gray-300">·</span>
               <div className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5 text-gray-400" />
-                <span><strong className="font-medium text-gray-800">6</strong> clubes</span>
+                <span>
+                  <strong className="font-medium text-gray-800">{dashboard.clubs}</strong>{" "}
+                  clubes
+                </span>
               </div>
               <span className="text-gray-300">·</span>
               <div className="flex items-center gap-1.5">
                 <Swords className="h-3.5 w-3.5 text-gray-400" />
-                <span><strong className="font-medium text-gray-800">0</strong> partidas</span>
+                <span>
+                  <strong className="font-medium text-gray-800">{dashboard.matches}</strong>{" "}
+                  partidas
+                </span>
               </div>
               <span className="text-gray-300">·</span>
               <div className="flex items-center gap-1.5">
@@ -210,8 +358,12 @@ export default function Home() {
                   <span className="font-mono text-xs text-gray-400">{n}</span>
                 </div>
 
-                <h3 className="mt-5 text-base font-medium leading-6">{title}</h3>
-                <p className="mt-1 text-xs leading-[18px] text-gray-500">{text}</p>
+                <h3 className="mt-5 text-base font-medium leading-6">
+                  {title}
+                </h3>
+                <p className="mt-1 text-xs leading-[18px] text-gray-500">
+                  {text}
+                </p>
 
                 {i < modules.length - 1 && (
                   <ChevronRight className="absolute -right-[18px] top-1/2 hidden h-4 w-4 -translate-y-1/2 text-gray-400 lg:block" />

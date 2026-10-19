@@ -17,13 +17,15 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "test:e2e": "vitest run --config vitest.config.e2e.ts"
+    "test:e2e": "vitest run --config vitest.config.e2e.ts",
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
     "@nestjs/core": "^12.0.1",
     "@nestjs/observe": "^0.3.0",
     "@nestjs/platform-express": "^12.0.1",
+    "@nestjs/swagger": "^12.0.2",
     "@prisma/client": "^6.19.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
@@ -52,6 +54,7 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.2",
     "unplugin-swc": "^2.0.0",
     "vitest": "^5.0.5"
