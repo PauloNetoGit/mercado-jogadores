@@ -1,6 +1,9 @@
-export type Position = 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
+import { divideRounded } from '../../common/money';
 
-interface PlayerAttributes {
+export type Position = 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
+export type PlayerCondition = 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
+
+export interface PlayerAttributes {
   posicao: Position;
   idade: number;
   potencial: number;
@@ -12,6 +15,7 @@ interface PlayerAttributes {
   fisico: number;
 }
 
+/** Pesos (%) de velocidade, finalização, passe, drible, defesa e físico, por posição (RN06). */
 const POSITION_WEIGHTS: Record<Position, number[]> = {
   GOL: [10, 0, 20, 0, 40, 30],
   ZAG: [10, 0, 15, 0, 45, 30],
@@ -20,6 +24,17 @@ const POSITION_WEIGHTS: Record<Position, number[]> = {
   ATA: [20, 40, 10, 20, 0, 10],
 };
 
+/** Desconto por condição física, em décimos de ponto percentual (RN02). */
+const CONDITION_DISCOUNT_TENTHS: Record<PlayerCondition, number> = {
+  APTO: 0,
+  MAL_CONDICIONADO: 150,
+  DOENTE: 300,
+};
+
+const MARKET_DISCOUNT_CAP_TENTHS = -400;
+const MIN_VALUE_CENTS = 100;
+
+/** RN06: soma ponderada dos seis atributos ÷ 100, arredondada para o inteiro mais próximo (meio para cima). */
 export function calculateOverall(player: PlayerAttributes): number {
   const attributes = [
     player.velocidade,
@@ -29,89 +44,62 @@ export function calculateOverall(player: PlayerAttributes): number {
     player.defesa,
     player.fisico,
   ];
-
   const weights = POSITION_WEIGHTS[player.posicao];
-
   const weightedSum = attributes.reduce(
     (sum, attribute, index) => sum + attribute * weights[index],
     0,
   );
-
-  return Math.floor(weightedSum / 100 + 0.5);
+  return Math.floor((weightedSum + 50) / 100);
 }
 
+/** Pontos de overall dentro de uma faixa [from, to]. */
+function pointsInRange(overall: number, from: number, to: number): number {
+  return Math.max(0, Math.min(overall, to) - from);
+}
+
+/** RN06: valor base, calculado uma única vez no cadastro. */
 export function calculateBaseValue(
   overall: number,
-  idade: number,
-  potencial: number,
+  age: number,
+  potential: number,
 ): number {
-  let value = 0;
+  // Em centavos: 0,50 por ponto de 41 a 60, 2,00 de 61 a 75 e 6,00 de 76 a 99.
+  let cents =
+    pointsInRange(overall, 40, 60) * 50 +
+    pointsInRange(overall, 60, 75) * 200 +
+    pointsInRange(overall, 75, 99) * 600;
 
-  if (overall > 40) {
-    value += Math.min(overall, 60) - 40 > 0
-      ? (Math.min(overall, 60) - 40) * 0.5
-      : 0;
+  if (age <= 21) {
+    cents = divideRounded(cents * (100 + potential - overall), 100);
   }
 
-  if (overall > 60) {
-    value += (Math.min(overall, 75) - 60) * 2;
-  }
-
-  if (overall > 75) {
-    value += (Math.min(overall, 99) - 75) * 6;
-  }
-
-  if (idade <= 21) {
-    value *= (100 + potencial - overall) / 100;
-  }
-
-  return Math.max(1, Math.floor(value * 100 + 0.5) / 100);
+  return Math.max(cents, MIN_VALUE_CENTS) / 100;
 }
 
-
-type PlayerCondition = 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
-
+/** RN02 a RN05: valor de mercado, calculado a cada consulta. */
 export function calculateMarketValue(
   baseValue: number,
   condition: PlayerCondition,
   agility: number,
   age: number,
 ): number {
-  // RN02: desconto inicial por condição física.
-  let conditionDiscount = {
-    APTO: 0,
-    MAL_CONDICIONADO: 15,
-    DOENTE: 30,
-  }[condition];
+  let discount = CONDITION_DISCOUNT_TENTHS[condition];
 
-  // RN03: ajuste do desconto conforme a agilidade.
+  // RN03: a agilidade só age quando o jogador não está APTO.
   if (condition !== 'APTO') {
-    if (agility >= 80) {
-      conditionDiscount /= 2;
-    } else if (agility <= 30) {
-      conditionDiscount += 10;
-    }
+    if (agility >= 80) discount /= 2;
+    else if (agility <= 30) discount += 100;
   }
 
-  // RN04: ajuste por idade.
+  // RN04: ajuste por idade, em décimos de ponto percentual.
   let ageAdjustment = 0;
+  if (age <= 21) ageAdjustment = 100;
+  else if (age >= 32) ageAdjustment = -100;
 
-  if (age <= 21) {
-    ageAdjustment = 10;
-  } else if (age >= 32) {
-    ageAdjustment = -10;
-  }
+  // RN05: percentual total, com teto de desconto de 40%.
+  const total = Math.max(MARKET_DISCOUNT_CAP_TENTHS, ageAdjustment - discount);
 
-  // RN05: percentual total, limitado a -40%.
-  const totalPercentage = Math.max(
-    -40,
-    ageAdjustment - conditionDiscount,
-  );
-
-  // Arredonda para duas casas decimais.
-  const calculatedValue =
-    Math.round((baseValue * (100 + totalPercentage) / 100) * 100) / 100;
-
-  // Valor mínimo de R$ 1,00.
-  return Math.max(1, calculatedValue);
+  const baseCents = Math.round(baseValue * 100);
+  const cents = divideRounded(baseCents * (1000 + total), 1000);
+  return Math.max(cents, MIN_VALUE_CENTS) / 100;
 }
