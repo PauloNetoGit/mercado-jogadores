@@ -1,29 +1,36 @@
-
+import { Transform } from 'class-transformer';
 import {
   IsIn,
   IsInt,
   IsString,
+  Matches,
   Max,
   MaxLength,
   Min,
   MinLength,
-  Matches,
 } from 'class-validator';
+import { normalizeSpaces } from '../../common/text';
+import { POSITIONS } from './player-fields';
+
+const normalizeName = ({ value }: { value: unknown }) =>
+  typeof value === 'string' ? normalizeSpaces(value) : value;
 
 export class CreatePlayerDto {
+  @Transform(normalizeName)
   @IsString()
   @MinLength(3)
   @MaxLength(100)
-  @Matches(/^[^\d]*$/, {
-    message: 'name não pode conter dígitos',
+  @Matches(/^[^\p{Cc}]*$/u, {
+    message: 'name não pode ter caracteres de controle.',
   })
-  @Matches(/^\S+ +\S+(?: +\S+)*$/, {
-    message: 'name deve conter pelo menos duas palavras',
+  @Matches(/^[^0-9]*$/, { message: 'name não pode ter dígitos.' })
+  @Matches(/^(?=.*\p{L}\S* \S*\p{L})/u, {
+    message: 'name deve ter pelo menos duas palavras.',
   })
   name: string;
 
-  @IsIn(['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'])
-  position: 'GOL' | 'ZAG' | 'LAT' | 'MEI' | 'ATA';
+  @IsIn(POSITIONS)
+  position: (typeof POSITIONS)[number];
 
   @IsInt()
   @Min(1)

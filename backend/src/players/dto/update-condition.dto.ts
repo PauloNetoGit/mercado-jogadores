@@ -1,6 +1,7 @@
 import { IsIn } from 'class-validator';
+import { CONDITIONS } from './player-fields';
 
 export class UpdateConditionDto {
-  @IsIn(['APTO', 'MAL_CONDICIONADO', 'DOENTE'])
-  condition: 'APTO' | 'MAL_CONDICIONADO' | 'DOENTE';
+  @IsIn(CONDITIONS)
+  condition: (typeof CONDITIONS)[number];
 }
