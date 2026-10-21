@@ -1,145 +1,74 @@
 import {
   Body,
-  Patch,
-  Put,
   Controller,
+  Delete,
   Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
+  HttpCode,
+  Patch,
   Post,
+  Put,
   Query,
   Res,
-  Delete,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
-import {
-  ApiOperation,
-  ApiParam,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { PlayersService } from './players.service';
+import { PlayerId } from '../common/parse-id.pipe';
+import type { RawQuery } from '../common/query-params';
 import { CreatePlayerDto } from './dto/create-player.dto';
-import { QueryPlayersDto } from './dto/query-players.dto';
-import { UpdatePlayerDto } from './dto/update-player.dto';
+import { parsePlayersQuery } from './dto/query-players';
 import { UpdateConditionDto } from './dto/update-condition.dto';
+import { UpdatePlayerDto } from './dto/update-player.dto';
+import { PlayersService } from './players.service';
 
 @ApiTags('Jogadores')
 @Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
-  @ApiOperation({ summary: 'Atualizar os dados de um jogador' })
-  @ApiParam({ name: 'id', description: 'ID do jogador', example: 1 })
-  @ApiResponse({ status: 200, description: 'Jogador atualizado.' })
-  @ApiResponse({ status: 404, description: 'Jogador não encontrado.' })
-  @Put(':id')
-  @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePlayerDto) {
-    return this.playersService.update(id, dto);
+  @ApiOperation({
+    summary: 'Lista paginada, com busca, filtros e ordenação (RN07)',
+  })
+  @Get()
+  findAll(@Query() query: RawQuery) {
+    return this.playersService.findAll(parsePlayersQuery(query));
   }
 
-  @ApiOperation({ summary: 'Atualizar a condição física do jogador' })
-  @ApiParam({ name: 'id', description: 'ID do jogador', example: 1 })
-  @ApiResponse({ status: 200, description: 'Condição atualizada.' })
-  @ApiResponse({ status: 400, description: 'Transição de condição inválida.' })
-  @Patch(':id/condition')
-  @Patch(':id/condition')
-  updateCondition(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateConditionDto,
-  ) {
-    return this.playersService.updateCondition(id, dto.condition);
+  @ApiOperation({ summary: 'Detalhes de um jogador' })
+  @Get(':id')
+  findOne(@PlayerId() id: number) {
+    return this.playersService.findOne(id);
   }
 
-  @ApiOperation({ summary: 'Cadastrar um novo jogador' })
-  @ApiResponse({ status: 201, description: 'Jogador cadastrado.' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
-
+  @ApiOperation({
+    summary:
+      'Cadastra um jogador livre e APTO; o valor base é calculado (RN06)',
+  })
   @Post()
   async create(
     @Body() dto: CreatePlayerDto,
     @Res({ passthrough: true }) response: Response,
   ) {
     const player = await this.playersService.create(dto);
-
-
     response.setHeader('Location', `/api/v1/players/${player.id}`);
-
     return player;
   }
 
-  @ApiOperation({ summary: 'Listar, pesquisar, filtrar e ordenar jogadores' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    description: 'Página',
-    example: 1,
-  })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    description: 'Itens por página',
-    example: 10,
-  })
-  @ApiQuery({
-    name: 'search',
-    required: false,
-    type: String,
-    description: 'Pesquisa por nome',
-  })
-  @ApiQuery({
-    name: 'position',
-    required: false,
-    type: String,
-    description: 'Posição do jogador',
-  })
-  @ApiQuery({
-    name: 'club_id',
-    required: false,
-    type: Number,
-    description: 'Filtrar por clube',
-  })
-  @ApiQuery({
-    name: 'free',
-    required: false,
-    enum: ['true', 'false'],
-    description: 'Filtrar jogadores livres ou vinculados a clubes',
-  })
-  @ApiResponse({ status: 200, description: 'Lista paginada de jogadores.' })
-  @Get()
-  @Get()
-  findAll(@Query() query: QueryPlayersDto) {
-    return this.playersService.findAll(query.page, query.limit, query);
+  @ApiOperation({ summary: 'Edita nome, posição, agilidade e idade (RN08)' })
+  @Put(':id')
+  update(@PlayerId() id: number, @Body() dto: UpdatePlayerDto) {
+    return this.playersService.update(id, dto);
   }
 
-  @ApiOperation({ summary: 'Consultar um jogador pelo ID' })
-  @ApiParam({ name: 'id', description: 'ID do jogador', example: 1 })
-  @ApiResponse({ status: 200, description: 'Dados do jogador.' })
-  @ApiResponse({ status: 404, description: 'Jogador não encontrado.' })
-  @Get(':id')
-  @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    const player = await this.playersService.findOne(id);
-
-    if (!player) {
-      throw new NotFoundException('Jogador não encontrado.');
-    }
-
-    return player;
+  @ApiOperation({ summary: 'Altera a condição física' })
+  @Patch(':id/condition')
+  updateCondition(@PlayerId() id: number, @Body() dto: UpdateConditionDto) {
+    return this.playersService.updateCondition(id, dto.condition);
   }
 
-  @ApiOperation({ summary: 'Excluir um jogador' })
-  @ApiParam({ name: 'id', description: 'ID do jogador', example: 1 })
-  @ApiResponse({ status: 200, description: 'Operação de exclusão concluída.' })
-  @ApiResponse({ status: 404, description: 'Jogador não encontrado.' })
+  @ApiOperation({ summary: 'Exclusão lógica de jogador livre (RN09)' })
   @Delete(':id')
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  @HttpCode(204)
+  remove(@PlayerId() id: number) {
     return this.playersService.remove(id);
   }
 }
