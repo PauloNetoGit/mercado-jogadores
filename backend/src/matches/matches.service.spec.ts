@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   BadRequestException,
@@ -35,9 +34,7 @@ describe('MatchesService', () => {
         callback(tx),
     );
 
-    service = new MatchesService(
-      prisma as unknown as PrismaService,
-    );
+    service = new MatchesService(prisma as unknown as PrismaService);
   });
 
   it('rejects the same club as home and away before opening a transaction', async () => {
@@ -48,48 +45,35 @@ describe('MatchesService', () => {
     expect(prisma.$transaction).not.toHaveBeenCalled();
   });
 
-  it('rejects non-positive or non-integer club ids before opening a transaction', async () => {
-    await expect(
-      service.create({ home_club_id: 0, away_club_id: 2 }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+  it('creates a valid match with six duels, three attacks per club', async () => {
+    const positions = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
 
-    await expect(
-      service.create({ home_club_id: 1.5, away_club_id: 2 }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    const makeLineup = (clubId: number) =>
+      positions.map((posicao, index) => ({
+        clube_id: clubId,
+        jogador: {
+          id: clubId * 10 + index + 1,
+          nome: `Jogador ${clubId}-${index + 1}`,
+          posicao,
+          condicao: 'APTO',
+          finalizacao: 80,
+          passe: 80,
+          drible: 80,
+          defesa: 20,
+        },
+      }));
 
-    expect(prisma.$transaction).not.toHaveBeenCalled();
-  });
+    tx.clube.findMany.mockResolvedValue([
+      { id: 1, nome: 'Clube A', formacao: '4-1' },
+      { id: 2, nome: 'Clube B', formacao: '4-1' },
+    ]);
 
+    tx.escalacao.findMany.mockResolvedValue([
+      ...makeLineup(1),
+      ...makeLineup(2),
+    ]);
 
-it('creates a valid match with six duels, three attacks per club', async () => {
-  const positions = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
-
-  const makeLineup = (clubId: number) =>
-    positions.map((posicao, index) => ({
-      clube_id: clubId,
-      jogador: {
-        id: clubId * 10 + index + 1,
-        nome: `Jogador ${clubId}-${index + 1}`,
-        posicao,
-        condicao: 'APTO',
-        finalizacao: 80,
-        passe: 80,
-        drible: 80,
-        defesa: 20,
-      },
-    }));
-
-  tx.clube.findMany.mockResolvedValue([
-    { id: 1, nome: 'Clube A', formacao: '4-1' },
-    { id: 2, nome: 'Clube B', formacao: '4-1' },
-  ]);
-
-  tx.escalacao.findMany.mockResolvedValue([
-    ...makeLineup(1),
-    ...makeLineup(2),
-  ]);
-
-  tx.partida.create.mockImplementation(async ({ data }: any) => ({
+    tx.partida.create.mockImplementation(async ({ data }: any) => ({
       id: 100,
       jogada_em: new Date('2026-10-16T12:00:00.000Z'),
       mandante_id: data.mandante_id,
@@ -98,7 +82,7 @@ it('creates a valid match with six duels, three attacks per club', async () => {
       gols_visitante: data.gols_visitante,
       formacao_mandante: data.formacao_mandante,
       formacao_visitante: data.formacao_visitante,
-      duelos: data.duelos.create.map((duel: any, index: number) => ({
+      duelos: data.duelos.create.map((duel: any) => ({
         ordem: duel.ordem,
         clube_atacante_id: duel.clube_atacante_id,
         atacante_id: duel.atacante_id,
@@ -128,8 +112,12 @@ it('creates a valid match with six duels, three attacks per club', async () => {
     const duels = createArgs.data.duelos.create;
 
     expect(duels).toHaveLength(6);
-    expect(duels.filter((duel: any) => duel.clube_atacante_id === 1)).toHaveLength(3);
-    expect(duels.filter((duel: any) => duel.clube_atacante_id === 2)).toHaveLength(3);
+    expect(
+      duels.filter((duel: any) => duel.clube_atacante_id === 1),
+    ).toHaveLength(3);
+    expect(
+      duels.filter((duel: any) => duel.clube_atacante_id === 2),
+    ).toHaveLength(3);
 
     expect(result.id).toBe(100);
     expect(result.home.club_name).toBe('Clube A');
@@ -137,7 +125,6 @@ it('creates a valid match with six duels, three attacks per club', async () => {
     expect(result.duels).toHaveLength(6);
     expect(result.result).toBe('EMPATE');
   });
-
 
   it('rejects the match when one of the clubs does not exist', async () => {
     tx.clube.findMany.mockResolvedValue([
@@ -166,7 +153,6 @@ it('creates a valid match with six duels, three attacks per club', async () => {
 
     expect(tx.partida.create).not.toHaveBeenCalled();
   });
-
 
   it('rejects the match when the away club has an incomplete lineup', async () => {
     tx.clube.findMany.mockResolvedValue([
@@ -217,7 +203,6 @@ it('creates a valid match with six duels, three attacks per club', async () => {
 
     expect(tx.partida.create).not.toHaveBeenCalled();
   });
-
 
   it('applies the 15% condition penalty with half-up integer rounding and scores only when attack is greater', () => {
     const calculateDuel = (

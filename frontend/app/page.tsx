@@ -84,11 +84,18 @@ type Match = {
   id: number;
 };
 
+type Standing = {
+  position: number;
+  club_name: string;
+  points: number;
+};
+
 type DashboardData = {
   players: number;
   freePlayers: number;
   clubs: number;
   matches: number;
+  leader: { name: string; points: number } | null;
 };
 
 export default function Home() {
@@ -99,6 +106,7 @@ export default function Home() {
     freePlayers: 0,
     clubs: 0,
     matches: 0,
+    leader: null,
   });
 
   const [dashboardError, setDashboardError] = useState(false);
@@ -108,22 +116,33 @@ export default function Home() {
 
     async function loadDashboard() {
       try {
-        const [playersResponse, clubsResponse, matchesResponse] =
-          await Promise.all([
-            api.get<PlayersResponse>("/players"),
-            api.get<Club[]>("/clubs"),
-            api.get<Match[]>("/matches"),
-          ]);
+        const [
+          playersResponse,
+          freeResponse,
+          clubsResponse,
+          matchesResponse,
+          standings,
+        ] = await Promise.all([
+          api.get<PlayersResponse>("/players?page=1&limit=1"),
+          api.get<PlayersResponse>("/players?page=1&limit=1&free=true"),
+          api.get<Club[]>("/clubs"),
+          api.get<Match[]>("/matches"),
+          // A classificação só enfeita o selo: se falhar, o resto continua.
+          api.get<Standing[]>("/standings").catch(() => [] as Standing[]),
+        ]);
 
         if (!active) return;
 
         setDashboard({
           players: playersResponse.meta.total,
-          freePlayers: playersResponse.data.filter(
-            (player) => player.club_id === null,
-          ).length,
+          freePlayers: freeResponse.meta.total,
           clubs: clubsResponse.length,
           matches: matchesResponse.length,
+          // A API já devolve a tabela ordenada (pontos, saldo, gols pró, nome).
+          leader:
+            matchesResponse.length > 0 && standings.length > 0
+              ? { name: standings[0].club_name, points: standings[0].points }
+              : null,
         });
 
         setDashboardError(false);
@@ -266,7 +285,11 @@ export default function Home() {
                   ? "dados indisponíveis"
                   : dashboard.matches === 0
                     ? "nenhuma partida ainda"
-                    : `${dashboard.matches} ${
+                    : dashboard.leader
+                      ? `líder: ${dashboard.leader.name}, ${dashboard.leader.points} ${
+                          dashboard.leader.points === 1 ? "ponto" : "pontos"
+                        }`
+                      : `${dashboard.matches} ${
                         dashboard.matches === 1
                           ? "partida registrada"
                           : "partidas registradas"

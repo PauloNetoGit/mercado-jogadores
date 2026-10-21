@@ -16,100 +16,54 @@ Versões principais das dependências:
 - Backend: NestJS 12, Prisma e Prisma Client 6.19.3, Vitest 5.0.5.
 - Frontend: Next.js 16.4.1, React 19.3.0 e Tailwind CSS 4.
 
-## 2. Configuração do ambiente
+## 2. Banco de dados, backend e frontend (passo a passo)
 
-Clone o repositório e entre na pasta do projeto.
-
-Configure o arquivo `.env` da raiz com a variável `POSTGRES_PASSWORD`, utilizada pelo Docker Compose:
-
-```env
-POSTGRES_PASSWORD=defina_uma_senha_local
-```
-
-O arquivo `.env.example` serve como referência das variáveis utilizadas pelo projeto. Não use senhas reais no arquivo de exemplo nem versione arquivos `.env` com credenciais.
-
-Configure `backend/.env` com a URL de conexão do PostgreSQL:
-
-```env
-DATABASE_URL="postgresql://mercado_app:SUA_SENHA@localhost:5432/mercado_jogadores?schema=public"
-```
-
-Substitua `SUA_SENHA` pela mesma senha definida em `POSTGRES_PASSWORD`. Se a senha tiver caracteres especiais, codifique-os corretamente na URL.
-
-O backend aceita as seguintes variáveis:
-
-| Variável | Finalidade | Valor padrão |
-|---|---|---|
-| `DATABASE_URL` | Conexão do Prisma com o PostgreSQL | Obrigatória |
-| `PORT` | Porta HTTP do backend | `3000` |
-| `FRONTEND_URL` | Origem permitida pelo CORS | `http://localhost:5173` |
-
-No frontend, configure `frontend/.env.local`:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000/api/v1
-```
-
-## 3. Banco de dados e migrações
-
-Na raiz do projeto, inicie o PostgreSQL:
+Todos os comandos abaixo podem ser copiados e executados no Ubuntu 24.04 com Docker. A API fica em `http://localhost:3000` (os caminhos começam em `/api/v1`) e a interface em `http://localhost:5173`.
 
 ```bash
+# Na raiz do repositório: variáveis do Docker Compose e subida do PostgreSQL
+cp .env.example .env
 docker compose up -d postgres
-```
 
-Verifique o estado das migrações:
-
-```bash
+# Backend (terminal 1)
 cd backend
-npx prisma migrate status
-```
-
-Para aplicar as migrações existentes em um banco configurado:
-
-```bash
+cp .env.example .env
+npm ci
 npx prisma migrate deploy
-```
-
-O schema do Prisma está em `backend/prisma/schema.prisma`, e as migrações estão em `backend/prisma/migrations/`.
-
-Para interromper o container sem apagar os dados:
-
-```bash
-docker compose stop postgres
-```
-
-O projeto utiliza o volume persistente `postgres_data`. Não utilize comandos que removam volumes sem compreender que isso pode apagar os dados do banco.
-
-## 4. Instalação e execução
-
-### Backend
-
-Em um terminal:
-
-```bash
-cd backend
-npm install
 npm run start:dev
+
+# Frontend (terminal 2, a partir da raiz do repositório)
+cd frontend
+cp .env.example .env.local
+npm ci
+npm run dev
 ```
 
-A API fica disponível, por padrão, em `http://localhost:3000/api/v1`.
+O banco criado pelas migrações começa vazio (sem jogadores, clubes, transações nem partidas). A documentação interativa da API (Swagger) fica em `http://localhost:3000/api/docs`.
 
-### Frontend
+### Recriar o banco do zero
 
-Em outro terminal:
+Na pasta `backend`, com o PostgreSQL de pé:
 
 ```bash
-cd frontend
-npm install
-npm run dev -- --port 5173
+npx prisma migrate reset --force --skip-seed
 ```
 
-A interface fica disponível em `http://localhost:5173`.
+O comando apaga o schema, reaplica todas as migrações e deixa o banco vazio. Para parar o container sem apagar os dados: `docker compose stop postgres`.
 
-O frontend utiliza `NEXT_PUBLIC_API_URL` para identificar a API. O backend utiliza `FRONTEND_URL` para configurar o CORS. Mantenha essas URLs alinhadas com as portas utilizadas.
+## 3. Variáveis de ambiente
 
-## 5. Testes e validação
+Cada pasta tem seu `.env.example`; copie para `.env` (ou `.env.local` no frontend) e ajuste a senha, que precisa ser a mesma em `POSTGRES_PASSWORD` (raiz) e em `DATABASE_URL` (backend). Não versione arquivos `.env` com credenciais.
+
+| Variável | Onde | Finalidade | Padrão |
+|---|---|---|---|
+| `POSTGRES_PASSWORD` | raiz | Senha do PostgreSQL no Docker Compose | obrigatória |
+| `DATABASE_URL` | backend | Conexão do Prisma com o PostgreSQL | obrigatória |
+| `PORT` | backend | Porta HTTP da API | `3000` |
+| `FRONTEND_URL` | backend | Origem permitida pelo CORS | `http://localhost:5173` |
+| `NEXT_PUBLIC_API_URL` | frontend | URL base da API, com `/api/v1` | `http://localhost:3000/api/v1` |
+
+## 4. Testes, lint e formatação
 
 No diretório `backend`, execute os testes unitários:
 
@@ -123,10 +77,11 @@ Para gerar o relatório de cobertura:
 npm run test:cov
 ```
 
-Para executar os testes de ponta a ponta:
+Lint e verificação de formatação (sem alterar arquivos):
 
 ```bash
-npm run test:e2e
+npm run lint
+npm run format:check
 ```
 
 Para compilar o backend:
@@ -142,7 +97,7 @@ npm run lint
 npm run build
 ```
 
-## 6. Estrutura do projeto
+## 5. Estrutura do projeto
 
 ```text
 mercado-jogadores/
@@ -165,7 +120,7 @@ mercado-jogadores/
 
 A estrutura organiza a API por domínios funcionais. O Prisma gerencia o acesso ao PostgreSQL; o NestJS organiza os módulos e serviços do backend; e o Next.js implementa a interface web.
 
-## 6.1. Bibliotecas principais
+## 5.1. Bibliotecas principais
 
 ### Backend
 
@@ -173,6 +128,8 @@ A estrutura organiza a API por domínios funcionais. O Prisma gerencia o acesso 
 - **Prisma** (`prisma`, `@prisma/client`): schema, migrações e acesso ao PostgreSQL.
 - **class-validator** e **class-transformer**: validação e transformação dos dados recebidos pela API.
 - **Vitest**: execução dos testes automatizados.
+- **oxlint** e **Prettier**: lint e formatação do backend.
+- **@nestjs/swagger**: documentação interativa da API.
 - **dotenv**: carregamento de variáveis de ambiente na configuração do Prisma.
 
 ### Frontend
@@ -183,7 +140,7 @@ A estrutura organiza a API por domínios funcionais. O Prisma gerencia o acesso 
 - **lucide-react**: ícones da interface.
 - **ESLint** e **eslint-config-next**: análise estática e regras de qualidade do código frontend.
 
-## 7. Decisões e premissas
+## 6. Decisões e premissas
 
 - PostgreSQL é executado em container Docker e mantém os dados em volume persistente.
 - O Prisma é utilizado para modelar o banco e controlar as migrações.
@@ -191,11 +148,17 @@ A estrutura organiza a API por domínios funcionais. O Prisma gerencia o acesso 
 - A API utiliza o prefixo global `/api/v1`.
 - O CORS permite a origem configurada em `FRONTEND_URL`.
 - As configurações locais e credenciais devem permanecer nos arquivos de ambiente ignorados pelo Git.
+- Dinheiro é calculado em centavos inteiros no backend; o arredondamento é “meio para longe do zero”, aplicado uma única vez ao final de cada regra.
+- Nomes são comparados e ordenados sem acento e sem diferenciar maiúsculas de minúsculas; empates se resolvem pelo id.
+- Nas validações, a ordem de resposta é 400, depois 404, depois 409. Id inválido na URL (letras, zero, negativo, zero à esquerda ou acima de 2.147.483.647) responde 404.
+- O jogador excluído (`DELETE`) é apagado de forma lógica: some das consultas, mas as transações antigas mantêm o nome gravado.
+- O CSV do histórico é entregue pelo frontend exatamente como a API devolve (UTF-8, sem BOM, separador `;`, decimais com vírgula).
+- Compra, venda, escalação, criação de clube e partida usam transações Serializable; conflitos concorrentes respondem 409.
 
-## 8. Funcionalidades não implementadas
+## 7. Funcionalidades não implementadas
 
-Documentar aqui as funcionalidades previstas no enunciado que não foram concluídas. Se todas as funcionalidades obrigatórias estiverem implementadas e validadas, registrar explicitamente: **Nenhuma**.
+Nenhuma.
 
-## 9. Uso de inteligência artificial
+## 8. Uso de inteligência artificial
 
-Registrar as ferramentas de inteligência artificial utilizadas durante o desenvolvimento e descrever, de forma transparente, em quais atividades auxiliaram. Informar também que o código e os resultados foram revisados e testados pelo responsável pelo projeto.
+Utilizei o Claude (Anthropic) como apoio ao desenvolvimento, em: revisão do backend contra as regras de negócio do enunciado (RN01 a RN21 e V1 a V9), escrita e ajuste das telas do frontend (clubes, escalação, compra e venda, histórico, partidas, classificação e estados de tela), geração de testes unitários dos cálculos, e redação deste README e das mensagens de commit. Aceitei, alterei ou descartei as sugestões após ler o código gerado; executei o backend, os testes e as telas, e sou responsável pelo resultado final.

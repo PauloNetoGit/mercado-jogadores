@@ -14,11 +14,17 @@ import {
   Check,
   ChevronDown,
   ChevronRight,
-  CircleAlert,
   Plus,
   Shield,
 } from "lucide-react";
 import { AppShell, useSidebarData } from "@/src/components/AppShell";
+import {
+  ErrorCard,
+  LoadingLabel,
+  StateCard,
+  describeLoadError,
+  stateButtonClass,
+} from "@/src/components/ListStates";
 import { NewClubModal } from "@/src/components/clubs/NewClubModal";
 import {
   CAIXA_INICIAL,
@@ -30,19 +36,20 @@ import {
 import type { Clube } from "@/src/types";
 import { formatMoney } from "@/src/utils/format";
 
-const SORT_OPTIONS: { value: OrdenacaoClubes; label: string; short: string }[] = [
-  { value: "name", label: "Nome", short: "nome" },
-  {
-    value: "net_worth_desc",
-    label: "Patrimônio (maior para o menor)",
-    short: "patrimônio (maior para o menor)",
-  },
-  {
-    value: "net_worth_asc",
-    label: "Patrimônio (menor para o maior)",
-    short: "patrimônio (menor para o maior)",
-  },
-];
+const SORT_OPTIONS: { value: OrdenacaoClubes; label: string; short: string }[] =
+  [
+    { value: "name", label: "Nome", short: "nome" },
+    {
+      value: "net_worth_desc",
+      label: "Patrimônio (maior para o menor)",
+      short: "patrimônio (maior para o menor)",
+    },
+    {
+      value: "net_worth_asc",
+      label: "Patrimônio (menor para o maior)",
+      short: "patrimônio (menor para o maior)",
+    },
+  ];
 
 export default function ClubesPage() {
   const router = useRouter();
@@ -86,9 +93,7 @@ export default function ClubesPage() {
       })
       .catch((err: unknown) => {
         if (cancelled) return;
-        setError(
-          err instanceof Error ? err.message : "Não foi possível carregar os clubes.",
-        );
+        setError(describeLoadError(err));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -121,7 +126,8 @@ export default function ClubesPage() {
   const closeModal = useCallback(() => {
     setManualOpen(false);
     setQueryDismissed(true);
-    if (window.location.search) window.history.replaceState(null, "", "/clubes");
+    if (window.location.search)
+      window.history.replaceState(null, "", "/clubes");
   }, []);
 
   function handleCreated(club: Clube) {
@@ -153,7 +159,8 @@ export default function ClubesPage() {
     setSortOpen(false);
   }
 
-  const selected = SORT_OPTIONS.find((option) => option.value === sort) ?? SORT_OPTIONS[0];
+  const selected =
+    SORT_OPTIONS.find((option) => option.value === sort) ?? SORT_OPTIONS[0];
 
   return (
     <AppShell
@@ -176,8 +183,8 @@ export default function ClubesPage() {
                 Clubes
               </h1>
               <p className="text-[13px] text-neutral-500">
-                Cada clube começa com {formatMoney(CAIXA_INICIAL)} em caixa e sem
-                jogadores. A liga aceita no máximo {MAX_CLUBES} clubes.
+                Cada clube começa com {formatMoney(CAIXA_INICIAL)} em caixa e
+                sem jogadores. A liga aceita no máximo {MAX_CLUBES} clubes.
               </p>
             </div>
           </div>
@@ -186,7 +193,11 @@ export default function ClubesPage() {
             type="button"
             onClick={openModal}
             disabled={atLimit}
-            title={atLimit ? `A liga já possui o limite de ${MAX_CLUBES} clubes.` : undefined}
+            title={
+              atLimit
+                ? `A liga já possui o limite de ${MAX_CLUBES} clubes.`
+                : undefined
+            }
             className="flex h-9 items-center gap-2 rounded-lg bg-[#155DFC] px-4 text-[13px] font-medium text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={15} strokeWidth={2} />
@@ -214,9 +225,17 @@ export default function ClubesPage() {
                 aria-expanded={sortOpen}
                 className="flex h-9 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-3 text-[13px] shadow-sm transition hover:bg-neutral-50"
               >
-                <ArrowUpDown size={13} strokeWidth={1.7} className="text-neutral-600" />
+                <ArrowUpDown
+                  size={13}
+                  strokeWidth={1.7}
+                  className="text-neutral-600"
+                />
                 Ordenar: {selected.short}
-                <ChevronDown size={13} strokeWidth={1.7} className="text-neutral-600" />
+                <ChevronDown
+                  size={13}
+                  strokeWidth={1.7}
+                  className="text-neutral-600"
+                />
               </button>
 
               {sortOpen && (
@@ -252,24 +271,41 @@ export default function ClubesPage() {
             </div>
           </div>
 
-          {error && (
-            <div
-              role="alert"
-              className="mx-3 mb-3 flex items-center gap-2.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[13px] text-red-700"
-            >
-              <CircleAlert size={15} strokeWidth={1.9} className="shrink-0" />
-              <span className="flex-1">{error}</span>
-              <button
-                type="button"
-                onClick={refresh}
-                className="font-medium underline underline-offset-2"
-              >
-                Tentar novamente
-              </button>
+          {error && clubs.length === 0 && !loading && (
+            <div className="border-t border-neutral-200 p-4">
+              <ErrorCard
+                what="os clubes"
+                message={error}
+                onRetry={refresh}
+                retrying={loading}
+              />
             </div>
           )}
 
-          <div className="overflow-x-auto border-t border-neutral-200">
+          {!error && !loading && clubs.length === 0 && (
+            <div className="border-t border-neutral-200 p-4">
+              <StateCard
+                icon={Shield}
+                title="Nenhum clube cadastrado"
+                description="Crie o primeiro clube para começar."
+              >
+                <button
+                  type="button"
+                  onClick={openModal}
+                  className={stateButtonClass}
+                >
+                  <Plus size={14} strokeWidth={1.8} />
+                  Novo clube
+                </button>
+              </StateCard>
+            </div>
+          )}
+
+          <div
+            className={`overflow-x-auto border-t border-neutral-200 ${
+              clubs.length === 0 && !loading ? "hidden" : ""
+            }`}
+          >
             <table className="w-full min-w-[720px] border-collapse text-[13px]">
               <thead>
                 <tr className="bg-neutral-50 text-[12px] text-neutral-500">
@@ -279,13 +315,22 @@ export default function ClubesPage() {
                   <th scope="col" className="px-4 py-2.5 text-left font-normal">
                     Sigla
                   </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
+                  <th
+                    scope="col"
+                    className="px-4 py-2.5 text-right font-normal"
+                  >
                     Caixa
                   </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
+                  <th
+                    scope="col"
+                    className="px-4 py-2.5 text-right font-normal"
+                  >
                     Valor do elenco
                   </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
+                  <th
+                    scope="col"
+                    className="px-4 py-2.5 text-right font-normal"
+                  >
                     Patrimônio
                   </th>
                   <th scope="col" className="w-[120px] px-4 py-2.5">
@@ -296,17 +341,6 @@ export default function ClubesPage() {
 
               <tbody>
                 {loading && clubs.length === 0 && <SkeletonRows />}
-
-                {!loading && !error && clubs.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-14 text-center">
-                      <p className="font-medium">Nenhum clube cadastrado</p>
-                      <p className="mt-1 text-[12px] text-neutral-500">
-                        Crie o primeiro clube para começar a montar a liga.
-                      </p>
-                    </td>
-                  </tr>
-                )}
 
                 {clubs.map((club) => (
                   <tr
@@ -361,7 +395,11 @@ export default function ClubesPage() {
       </div>
 
       {modalOpen && (
-        <NewClubModal clubs={clubs} onClose={closeModal} onCreated={handleCreated} />
+        <NewClubModal
+          clubs={clubs}
+          onClose={closeModal}
+          onCreated={handleCreated}
+        />
       )}
     </AppShell>
   );
@@ -374,6 +412,11 @@ function subscribeNoop() {
 function SkeletonRows() {
   return (
     <>
+      <tr>
+        <td colSpan={6} className="px-4 py-3">
+          <LoadingLabel label="Carregando clubes…" />
+        </td>
+      </tr>
       {Array.from({ length: 5 }).map((_, index) => (
         <tr key={index} className="border-t border-neutral-200">
           <td className="px-4 py-3.5" colSpan={6}>

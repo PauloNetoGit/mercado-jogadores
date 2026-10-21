@@ -9,17 +9,37 @@ export interface FiltrosJogadores {
   condition?: string;
   club_id?: number;
   free?: "true" | "false";
+  /** Faixas de idade e de valor de mercado. */
+  min_age?: number;
+  max_age?: number;
+  min_value?: number;
+  max_value?: number;
+  /** Ordenação (ex.: name, value_desc, value_asc, age_desc, age_asc, position). */
+  sort?: string;
+  /** Nomes antigos da API (age_min, age_max, sort_by + order), ainda aceitos aqui. */
   age_min?: number;
   age_max?: number;
-  sort_by: OrdenacaoJogadores;
-  order: "asc" | "desc";
+  sort_by?: OrdenacaoJogadores;
+  order?: "asc" | "desc";
   page: number;
   limit: number;
 }
 
 export interface PaginaJogadores {
   data: Jogador[];
-  meta: { page: number; limit: number; total: number; total_pages: number };
+  meta: { page: number; limit: number; total_items: number; total_pages: number };
+}
+
+/** A API pode devolver o total como total_items ou total; aqui vira sempre total_items. */
+interface PaginaBruta {
+  data: Jogador[];
+  meta: {
+    page: number;
+    limit: number;
+    total_items?: number;
+    total?: number;
+    total_pages: number;
+  };
 }
 
 export interface DadosJogador {
@@ -71,8 +91,13 @@ function toQuery(filters: FiltrosJogadores): string {
 }
 
 export const playersService = {
-  list: (filters: FiltrosJogadores) =>
-    api.get<PaginaJogadores>(`/players?${toQuery(filters)}`),
+  list: async (filters: FiltrosJogadores): Promise<PaginaJogadores> => {
+    const raw = await api.get<PaginaBruta>(`/players?${toQuery(filters)}`);
+    const { total_items, total, ...rest } = raw.meta;
+    return { data: raw.data, meta: { ...rest, total_items: total_items ?? total ?? 0 } };
+  },
+
+  get: (id: number) => api.get<Jogador>(`/players/${id}`),
 
   create: (body: DadosJogador) => api.post<Jogador>("/players", body),
 

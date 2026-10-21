@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Query,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
+import { MatchId } from '../common/parse-id.pipe';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { MatchesService } from './matches.service';
 
@@ -32,7 +24,7 @@ export class MatchesController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@MatchId() id: number) {
     return this.matchesService.findOne(id);
   }
 }

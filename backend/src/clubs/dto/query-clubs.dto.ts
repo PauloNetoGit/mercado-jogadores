@@ -6,5 +6,5 @@ export type ClubSort = (typeof CLUB_SORTS)[number];
 export class QueryClubsDto {
   @IsOptional()
   @IsIn(CLUB_SORTS)
-  sort?: ClubSort = 'name';
+  sort: ClubSort = 'name';
 }

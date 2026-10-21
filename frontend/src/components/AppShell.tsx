@@ -81,7 +81,7 @@ interface AppShellProps {
   sidebar: SidebarData;
   crumbs: Crumb[];
   /** Item de navegação destacado. */
-  activeSection?: "clubes" | "jogadores";
+  activeSection?: "clubes" | "jogadores" | "partidas" | "classificacao";
   activeClubId?: number | null;
   /** Se informado, o "+" da barra lateral abre o formulário em vez de navegar. */
   onNewClub?: () => void;
@@ -188,11 +188,15 @@ export function AppShell({
               icon={<Swords size={15} strokeWidth={1.7} />}
               label="Partidas"
               count={sidebar.matches.length}
+              active={activeSection === "partidas"}
+              current={activeSection === "partidas"}
             />
             <NavLink
               href="/classificacao"
               icon={<ListOrdered size={15} strokeWidth={1.7} />}
               label="Classificação"
+              active={activeSection === "classificacao"}
+              current={activeSection === "classificacao"}
             />
           </div>
 

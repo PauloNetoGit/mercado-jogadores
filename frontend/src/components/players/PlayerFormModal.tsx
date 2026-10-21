@@ -51,19 +51,31 @@ function intIn(value: string, min: number, max: number) {
   return n >= min && n <= max ? n : null;
 }
 
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="mt-1 flex items-center gap-1 text-[11px] text-[#E7000B]">
+      <CircleAlert size={12} strokeWidth={2} className="shrink-0" />
+      {message}
+    </p>
+  );
+}
+
 /** Espelha as regras do backend (players.service.ts e DTOs). */
-function validate(form: Form, creating: boolean): Partial<Record<keyof DadosJogador | "form", string>> {
+function validate(form: Form, creating: boolean, currentAge?: number): Partial<Record<keyof DadosJogador | "form", string>> {
   const errors: Partial<Record<keyof DadosJogador | "form", string>> = {};
   const name = form.name.trim().replace(/\s+/g, " ");
 
-  if (name.length < 3 || name.length > 100) errors.name = "De 3 a 100 caracteres.";
+  if (name.length < 3 || name.length > 100) errors.name = "Use de 3 a 100 caracteres.";
   else if (/\d/.test(name)) errors.name = "O nome não pode ter números.";
   else if (name.split(" ").length < 2) errors.name = "Use pelo menos duas palavras.";
 
   if (!form.position) errors.position = "Escolha a posição.";
 
   const age = intIn(form.age, 16, 45);
-  if (age === null) errors.age = "De 16 a 45 anos.";
+  if (age === null) errors.age = "Use uma idade de 16 a 45 anos.";
+  else if (currentAge !== undefined && age < currentAge)
+    errors.age = `A idade não pode diminuir (atual: ${currentAge}).`;
 
   const agility = intIn(form.agility, 1, 100);
   if (agility === null) errors.agility = "De 1 a 100.";
@@ -74,11 +86,11 @@ function validate(form: Form, creating: boolean): Partial<Record<keyof DadosJoga
   const values: number[] = [];
   for (const { key } of ATTRIBUTES) {
     const n = intIn(form[key], 1, 99);
-    if (n === null) errors[key] = "De 1 a 99.";
+    if (n === null) errors[key] = "Use um valor de 1 a 99.";
     else values.push(n);
   }
   const potential = intIn(form.potential, 1, 99);
-  if (potential === null) errors.potential = "De 1 a 99.";
+  if (potential === null) errors.potential = "Informe o potencial.";
 
   if (values.length === ATTRIBUTES.length) {
     const max = Math.max(...values);
@@ -116,7 +128,7 @@ export function PlayerFormModal({
   }
 
   async function submit() {
-    const found = validate(form, creating);
+    const found = validate(form, creating, player?.age);
     if (Object.values(found).some(Boolean)) return setErrors(found);
 
     const body: DadosJogador = {
@@ -201,29 +213,36 @@ export function PlayerFormModal({
             })}
           </div>
           {errors.position ? (
-            <p className="mt-1 text-[11px] text-red-600">{errors.position}</p>
+            <FieldError message={errors.position} />
           ) : hasClub ? (
-            <p className="mt-1 text-[11px] text-neutral-500">Jogador com clube não muda de posição.</p>
+            <p className="mt-1 text-[11px] text-neutral-500">Jogador com clube não muda de posição: as outras posições ficam desabilitadas.</p>
           ) : null}
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="Idade" error={errors.age} hint="De 16 a 45 anos.">
+        <div className={`grid gap-3 ${creating ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+          <Field
+            label="Idade"
+            error={errors.age}
+            hint={creating ? "De 16 a 45 anos." : `De 16 a 45, sem diminuir (atual: ${player.age}).`}
+          >
             <input inputMode="numeric" value={form.age} onChange={(e) => set("age", e.target.value)} className={inputClass} />
           </Field>
           <Field label="Agilidade" error={errors.agility} hint="De 1 a 100 (até 85 com 35 anos ou mais).">
             <input inputMode="numeric" value={form.agility} onChange={(e) => set("agility", e.target.value)} className={inputClass} />
           </Field>
-          {creating ? (
+          {creating && (
             <Field label="Valor base (moedas)" hint="Calculado no cadastro.">
               <Locked />
             </Field>
-          ) : (
-            <Field label="Valor base (moedas)" hint="Recalculado ao salvar.">
-              <Locked text={formatMoney(player.base_value)} />
-            </Field>
           )}
         </div>
+
+        {!creating && (
+          <p className="flex items-center gap-2 rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-3 py-2.5 text-[12px] text-neutral-600">
+            <Lock size={13} strokeWidth={1.7} className="shrink-0" />
+            Não mudam depois do cadastro: valor base ({formatMoney(player.base_value)}), indicadores e potencial.
+          </p>
+        )}
 
         {creating && (
           <div className="border-t border-neutral-200 pt-4">
@@ -262,10 +281,14 @@ export function PlayerFormModal({
       )}
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4">
-        <p className="flex items-center gap-1.5 text-[12px] text-neutral-500">
-          <Info size={13} strokeWidth={1.7} />
-          {creating ? "O jogador começa livre e Apto." : "Valor base, overall e valor de mercado são recalculados ao salvar."}
-        </p>
+        {creating ? (
+          <p className="flex items-center gap-1.5 text-[12px] text-neutral-500">
+            <Info size={13} strokeWidth={1.7} />
+            O jogador começa livre e Apto.
+          </p>
+        ) : (
+          <span />
+        )}
         <div className="flex gap-2">
           <button type="button" onClick={onClose} disabled={submitting} className={btnSecondary}>
             Cancelar
@@ -341,7 +364,10 @@ function Field({
       {label}
       <div className="mt-1">{children}</div>
       {error ? (
-        <span className="mt-1 block text-[11px] font-normal leading-4 text-red-600">{error}</span>
+        <span className="mt-1 flex items-start gap-1 text-[11px] font-normal leading-4 text-[#E7000B]">
+  <CircleAlert size={12} strokeWidth={2} className="mt-px shrink-0" />
+  {error}
+</span>
       ) : hint ? (
         <span className="mt-1 block text-[11px] font-normal leading-4 text-neutral-500">{hint}</span>
       ) : null}

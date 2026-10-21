@@ -1,4 +1,3 @@
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { StandingsService } from './standings.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -98,11 +97,13 @@ describe('StandingsService', () => {
 
     const table = await service.findAll();
 
-    expect(table.map(({ club_id, points, goal_difference }) => ({
-      club_id,
-      points,
-      goal_difference,
-    }))).toEqual([
+    expect(
+      table.map(({ club_id, points, goal_difference }) => ({
+        club_id,
+        points,
+        goal_difference,
+      })),
+    ).toEqual([
       { club_id: 1, points: 3, goal_difference: 1 },
       { club_id: 2, points: 3, goal_difference: -1 },
     ]);
@@ -117,14 +118,15 @@ describe('StandingsService', () => {
 
     const table = await service.findAll();
 
-    expect(table.map(({ position, club_id, club_name }) => ({
-      position,
-      club_id,
-      club_name,
-    }))).toEqual([
+    expect(
+      table.map(({ position, club_id, club_name }) => ({
+        position,
+        club_id,
+        club_name,
+      })),
+    ).toEqual([
       { position: 1, club_id: 2, club_name: 'Delta FC' },
       { position: 2, club_id: 1, club_name: 'Épsilon FC' },
     ]);
   });
-
 });
