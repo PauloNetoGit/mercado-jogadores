@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — Mercado de Jogadores
 
-## Getting Started
+Interface web do sistema, feita com Next.js 16 (App Router), React 19 e Tailwind CSS 4. Ela consome a API do backend (`/api/v1`). O passo a passo completo (banco, backend e frontend) está no [README da raiz](../README.md).
 
-First, run the development server:
+## Como rodar
+
+Com o backend e o banco no ar:
 
 ```bash
+cp .env.example .env.local
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A interface abre em http://localhost:5173.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variável | Finalidade | Padrão |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | URL base da API, com `/api/v1` | `http://localhost:3000/api/v1` |
 
-## Learn More
+O backend só aceita requisições da origem definida em `FRONTEND_URL` (padrão `http://localhost:5173`). Se mudar a porta do frontend, ajuste essa variável no `.env` do backend.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Comando | O que faz |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento na porta 5173 |
+| `npm run build` | Build de produção |
+| `npm start` | Serve o build de produção na porta 5173 (rode `npm run build` antes) |
+| `npm run lint` | Análise estática com ESLint |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Telas
 
-## Deploy on Vercel
+| Rota | Tela |
+|---|---|
+| `/jogadores` | Lista de jogadores com busca, filtros, ordenação e paginação; cadastro, edição, condição, exclusão e compra |
+| `/clubes` | Lista de clubes e cadastro de novo clube |
+| `/clubes/[id]` | Clube com indicadores e três abas: Elenco (com venda), Escalação e Histórico de transações (com exportação em CSV) |
+| `/partidas` | Histórico de partidas e nova partida |
+| `/partidas/[id]` | Detalhe da partida, com o campo e os duelos |
+| `/classificacao` | Classificação dos clubes |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Todas as listas têm os estados de carregamento, lista vazia e erro (com o botão “Tentar de novo”).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Estrutura
+
+```text
+frontend/
+├── app/                        # rotas (App Router)
+│   ├── jogadores/
+│   ├── clubes/ e clubes/[id]/
+│   ├── partidas/ e partidas/[id]/
+│   └── classificacao/
+├── public/                     # arquivos estáticos (logotipo)
+└── src/
+    ├── components/
+    │   ├── AppShell.tsx        # barra lateral, trilha de navegação e botão de atualizar
+    │   ├── Modal.tsx, Toast.tsx, ListStates.tsx
+    │   ├── players/            # modais de compra, condição, exclusão e cadastro; painel de detalhes
+    │   ├── clubs/              # escalação, histórico, venda e novo clube
+    │   └── matches/            # campo, duelos e nova partida
+    ├── services/               # chamadas à API (api, players, clubs, matches)
+    ├── types/                  # tipos compartilhados
+    └── utils/                  # formatação de valores, validações e cálculo de fidelidade
+```
+
+## Observações
+
+- A tela não calcula regras de negócio (overall, valor de mercado, multa): ela exibe o que a API devolve.
+- Datas e horários seguem o horário de Brasília (UTC−3).
+- O CSV do histórico é baixado exatamente como a API entrega (UTF-8, separador `;`, decimais com vírgula). Ao abrir no Excel ou no LibreOffice, use apenas o ponto e vírgula como separador.
+- A fonte Geist é carregada do Google Fonts pelo `next/font`. O primeiro `npm run dev` e o `npm run build` precisam de internet.
