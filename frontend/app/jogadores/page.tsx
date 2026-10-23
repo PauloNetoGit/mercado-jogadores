@@ -46,12 +46,7 @@ import {
 import { Avatar } from "@/src/components/players/Avatar";
 import { PlayerDrawer } from "@/src/components/players/PlayerDrawer";
 import { btnPrimary, btnSecondary, inputClass } from "@/src/components/Modal";
-import {
-  CONDICOES,
-  POSICOES,
-  playersService,
-  type FiltrosJogadores,
-} from "@/src/services/players";
+import { CONDICOES, POSICOES, playersService, type FiltrosJogadores } from "@/src/services/players";
 import type { Jogador } from "@/src/types";
 import { formatMoney } from "@/src/utils/format";
 
@@ -127,11 +122,7 @@ async function loadList(f: Filters): Promise<Result> {
 
   const specificClub = f.club !== "" && f.club !== "free";
   const clubParams: Partial<FiltrosJogadores> =
-    f.club === "free"
-      ? { free: "true" }
-      : specificClub
-        ? { club_id: Number(f.club) }
-        : {};
+    f.club === "free" ? { free: "true" } : specificClub ? { club_id: Number(f.club) } : {};
 
   if (f.tab === "free" && specificClub)
     return {
@@ -144,11 +135,8 @@ async function loadList(f: Filters): Promise<Result> {
       notice: "“Em clubes” não combina com o filtro “Livre”.",
     };
 
-  const query = (
-    extra: Partial<FiltrosJogadores>,
-    page: number,
-    limit: number,
-  ) => playersService.list({ ...base, ...clubParams, ...extra, page, limit });
+  const query = (extra: Partial<FiltrosJogadores>, page: number, limit: number) =>
+    playersService.list({ ...base, ...clubParams, ...extra, page, limit });
 
   const tabParam: Partial<FiltrosJogadores> =
     f.club === "free" || specificClub
@@ -163,9 +151,7 @@ async function loadList(f: Filters): Promise<Result> {
     query(tabParam, f.page, PAGE_SIZE),
     query({}, 1, 1),
     specificClub ? Promise.resolve(null) : query({ free: "true" }, 1, 1),
-    specificClub || f.club === "free"
-      ? Promise.resolve(null)
-      : query({ free: "false" }, 1, 1),
+    specificClub || f.club === "free" ? Promise.resolve(null) : query({ free: "false" }, 1, 1),
   ]);
 
   return {
@@ -225,16 +211,14 @@ export default function JogadoresPage() {
     const timer = window.setTimeout(() => {
       const value = searchInput.trim();
       setFilters((current) =>
-        current.search === value
-          ? current
-          : { ...current, search: value, page: 1 },
+        current.search === value ? current : { ...current, search: value, page: 1 },
       );
     }, 300);
     return () => window.clearTimeout(timer);
   }, [searchInput]);
 
   useEffect(() => {
-        let cancelled = false;
+    let cancelled = false;
     const minimum = slowReload.current
       ? new Promise<void>((resolve) => setTimeout(resolve, 1000))
       : Promise.resolve();
@@ -284,7 +268,7 @@ export default function JogadoresPage() {
     setFilters({ ...INITIAL_FILTERS, sort: filters.sort });
   }
 
-    function manualRefresh() {
+  function manualRefresh() {
     slowReload.current = true;
     setLoaded(null);
     refresh();
@@ -295,11 +279,7 @@ export default function JogadoresPage() {
     reloadSidebar();
   }
 
-  function notify(
-    title: string,
-    description?: string,
-    variant: "success" | "error" = "success",
-  ) {
+  function notify(title: string, description?: string, variant: "success" | "error" = "success") {
     setToast({ id: Date.now(), title, description, variant });
   }
 
@@ -312,10 +292,7 @@ export default function JogadoresPage() {
   /** Destaca por alguns segundos a linha que acabou de mudar. */
   function flash(id: number) {
     setHighlightId(id);
-    window.setTimeout(
-      () => setHighlightId((current) => (current === id ? null : current)),
-      4000,
-    );
+    window.setTimeout(() => setHighlightId((current) => (current === id ? null : current)), 4000);
   }
 
   function openMenu(player: Jogador, button: HTMLElement) {
@@ -342,8 +319,7 @@ export default function JogadoresPage() {
   const totalPages = loaded?.totalPages ?? 1;
 
   const chips: { label: string; clear: Partial<Filters> }[] = [];
-  if (filters.search)
-    chips.push({ label: `Busca: ${filters.search}`, clear: { search: "" } });
+  if (filters.search) chips.push({ label: `Busca: ${filters.search}`, clear: { search: "" } });
   if (filters.position)
     chips.push({
       label: `Posição: ${POSICOES[filters.position as keyof typeof POSICOES] ?? filters.position}`,
@@ -406,12 +382,9 @@ export default function JogadoresPage() {
               <Users size={18} strokeWidth={1.7} />
             </span>
             <div>
-              <h1 className="text-[20px] font-semibold leading-7 tracking-tight">
-                Jogadores
-              </h1>
+              <h1 className="text-[20px] font-semibold leading-7 tracking-tight">Jogadores</h1>
               <p className="text-[12px] text-neutral-500">
-                Cadastre jogadores, acompanhe os indicadores e compre os que
-                estão livres.
+                Cadastre jogadores, acompanhe os indicadores e compre os que estão livres.
               </p>
             </div>
           </div>
@@ -554,17 +527,9 @@ export default function JogadoresPage() {
           </div>
         ) : loaded && players.length === 0 ? (
           <div className="mt-4">
-            <StateCard
-              icon={filtered ? SearchX : Users}
-              title={emptyTitle}
-              description={emptyText}
-            >
+            <StateCard icon={filtered ? SearchX : Users} title={emptyTitle} description={emptyText}>
               {filtered ? (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className={stateButtonClass}
-                >
+                <button type="button" onClick={clearFilters} className={stateButtonClass}>
                   <X size={14} strokeWidth={1.8} />
                   Limpar filtros
                 </button>
@@ -614,16 +579,12 @@ export default function JogadoresPage() {
                             : "text-neutral-600 hover:text-neutral-950"
                         }`}
                       >
-                        {label}{" "}
-                        <span className="ml-0.5 text-neutral-500">{count}</span>
+                        {label} <span className="ml-0.5 text-neutral-500">{count}</span>
                       </button>
                     ))}
                   </div>
 
-                  <div
-                    className="relative"
-                    onClick={(event) => event.stopPropagation()}
-                  >
+                  <div className="relative" onClick={(event) => event.stopPropagation()}>
                     <button
                       type="button"
                       aria-expanded={sortOpen}
@@ -653,8 +614,7 @@ export default function JogadoresPage() {
                                 : ""
                             }`}
                           >
-                            {SORTS[key].label.charAt(0).toUpperCase() +
-                              SORTS[key].label.slice(1)}
+                            {SORTS[key].label.charAt(0).toUpperCase() + SORTS[key].label.slice(1)}
                           </button>
                         ))}
                       </div>
@@ -670,58 +630,31 @@ export default function JogadoresPage() {
               <table className="w-full min-w-[1040px] border-collapse text-[13px]">
                 <thead>
                   <tr className="bg-neutral-50 text-[12px] text-neutral-500">
-                    <th
-                      scope="col"
-                      className="px-4 py-2.5 text-left font-normal"
-                    >
+                    <th scope="col" className="px-4 py-2.5 text-left font-normal">
                       Jogador
                     </th>
-                    <th
-                      scope="col"
-                      className="px-2 py-2.5 text-left font-normal"
-                    >
+                    <th scope="col" className="px-2 py-2.5 text-left font-normal">
                       Posição
                     </th>
-                    <th
-                      scope="col"
-                      className="px-2 py-2.5 text-right font-normal"
-                    >
+                    <th scope="col" className="px-2 py-2.5 text-right font-normal">
                       Overall
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-2.5 text-left font-normal"
-                    >
+                    <th scope="col" className="px-3 py-2.5 text-left font-normal">
                       Agilidade
                     </th>
-                    <th
-                      scope="col"
-                      className="px-2 py-2.5 text-right font-normal"
-                    >
+                    <th scope="col" className="px-2 py-2.5 text-right font-normal">
                       Idade
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-2.5 text-left font-normal"
-                    >
+                    <th scope="col" className="px-3 py-2.5 text-left font-normal">
                       Condição
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-2.5 text-right font-normal"
-                    >
+                    <th scope="col" className="px-3 py-2.5 text-right font-normal">
                       Valor base
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-2.5 text-right font-normal"
-                    >
+                    <th scope="col" className="px-3 py-2.5 text-right font-normal">
                       Valor de mercado
                     </th>
-                    <th
-                      scope="col"
-                      className="px-3 py-2.5 text-left font-normal"
-                    >
+                    <th scope="col" className="px-3 py-2.5 text-left font-normal">
                       Clube
                     </th>
                     <th scope="col" className="px-3 py-2.5">
@@ -732,11 +665,7 @@ export default function JogadoresPage() {
                 <tbody>
                   {!loaded
                     ? Array.from({ length: 10 }).map((_, i) => (
-                        <tr
-                          key={i}
-                          aria-hidden
-                          className="border-t border-neutral-200"
-                        >
+                        <tr key={i} aria-hidden className="border-t border-neutral-200">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-2.5">
                               <SkeletonBar className="h-8 w-8 rounded-full" />
@@ -774,10 +703,7 @@ export default function JogadoresPage() {
                       ))
                     : players.map((player) => {
                         const status = CONDICOES[player.condition];
-                        const club =
-                          player.club_id === null
-                            ? null
-                            : clubsById.get(player.club_id);
+                        const club = player.club_id === null ? null : clubsById.get(player.club_id);
                         return (
                           <tr
                             key={player.id}
@@ -785,18 +711,11 @@ export default function JogadoresPage() {
                           >
                             <td className="px-4 py-2">
                               <div className="flex items-center gap-2.5">
-                                <Avatar
-                                  id={player.id}
-                                  name={player.name}
-                                  size={32}
-                                />
+                                <Avatar id={player.id} name={player.name} size={32} />
                                 <div className="leading-tight">
-                                  <p className="whitespace-nowrap font-medium">
-                                    {player.name}
-                                  </p>
+                                  <p className="whitespace-nowrap font-medium">{player.name}</p>
                                   <p className="text-[11px] text-neutral-500">
-                                    {POSICOES[player.position] ??
-                                      player.position}
+                                    {POSICOES[player.position] ?? player.position}
                                   </p>
                                 </div>
                               </div>
@@ -830,9 +749,7 @@ export default function JogadoresPage() {
                                 </span>
                               </div>
                             </td>
-                            <td className="px-2 py-2 text-right tabular-nums">
-                              {player.age}
-                            </td>
+                            <td className="px-2 py-2 text-right tabular-nums">{player.age}</td>
                             <td className="px-3 py-2">
                               <span
                                 className="inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium"
@@ -881,28 +798,20 @@ export default function JogadoresPage() {
                                 {player.club_id === null && (
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      setDialog({ kind: "buy", player })
-                                    }
+                                    onClick={() => setDialog({ kind: "buy", player })}
                                     className="flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-neutral-300 bg-white px-3 text-[12px] font-medium shadow-sm hover:bg-neutral-50"
                                   >
                                     <ShoppingCart size={13} strokeWidth={1.7} />
                                     Comprar
                                   </button>
                                 )}
-                                <div
-                                  onClick={(event) => event.stopPropagation()}
-                                >
+                                <div onClick={(event) => event.stopPropagation()}>
                                   <button
                                     type="button"
                                     aria-label={`Mais ações para ${player.name}`}
                                     aria-haspopup="menu"
-                                    aria-expanded={
-                                      menu?.player.id === player.id
-                                    }
-                                    onClick={(event) =>
-                                      openMenu(player, event.currentTarget)
-                                    }
+                                    aria-expanded={menu?.player.id === player.id}
+                                    onClick={(event) => openMenu(player, event.currentTarget)}
                                     className="rounded-md p-1.5 text-neutral-600 hover:bg-neutral-100"
                                   >
                                     <MoreHorizontal size={15} />
@@ -920,51 +829,36 @@ export default function JogadoresPage() {
             {loaded && (
               <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3 text-[12px] text-neutral-500">
                 <span>
-                  Mostrando {from}–{to} de {total}{" "}
-                  {total === 1 ? "jogador" : "jogadores"}
+                  Mostrando {from}–{to} de {total} {total === 1 ? "jogador" : "jogadores"}
                 </span>
                 <nav aria-label="Paginação" className="flex items-center gap-1">
                   <button
                     type="button"
                     disabled={filters.page <= 1 || loading}
-                    onClick={() =>
-                      setFilters((c) => ({ ...c, page: c.page - 1 }))
-                    }
+                    onClick={() => setFilters((c) => ({ ...c, page: c.page - 1 }))}
                     className="flex items-center gap-1 rounded-md px-2 py-1.5 font-semibold text-neutral-950 hover:bg-neutral-100 disabled:opacity-40"
                   >
                     <ChevronLeft size={15} /> Anterior
                   </button>
-                  {Array.from(
-                    { length: Math.min(totalPages, 3) },
-                    (_, index) => {
-                      const start = Math.max(
-                        1,
-                        Math.min(filters.page - 1, totalPages - 2),
-                      );
-                      const number = start + index;
-                      return (
-                        <button
-                          key={number}
-                          type="button"
-                          aria-current={
-                            filters.page === number ? "page" : undefined
-                          }
-                          onClick={() =>
-                            setFilters((c) => ({ ...c, page: number }))
-                          }
-                          className={`h-7 min-w-7 rounded-md px-2 ${filters.page === number ? "border border-neutral-200 bg-white font-medium text-neutral-950 shadow-sm" : "hover:bg-neutral-100"}`}
-                        >
-                          {number}
-                        </button>
-                      );
-                    },
-                  )}
+                  {Array.from({ length: Math.min(totalPages, 3) }, (_, index) => {
+                    const start = Math.max(1, Math.min(filters.page - 1, totalPages - 2));
+                    const number = start + index;
+                    return (
+                      <button
+                        key={number}
+                        type="button"
+                        aria-current={filters.page === number ? "page" : undefined}
+                        onClick={() => setFilters((c) => ({ ...c, page: number }))}
+                        className={`h-7 min-w-7 rounded-md px-2 ${filters.page === number ? "border border-neutral-200 bg-white font-medium text-neutral-950 shadow-sm" : "hover:bg-neutral-100"}`}
+                      >
+                        {number}
+                      </button>
+                    );
+                  })}
                   <button
                     type="button"
                     disabled={filters.page >= totalPages || loading}
-                    onClick={() =>
-                      setFilters((c) => ({ ...c, page: c.page + 1 }))
-                    }
+                    onClick={() => setFilters((c) => ({ ...c, page: c.page + 1 }))}
                     className="flex items-center gap-1 rounded-md px-2 py-1.5 font-semibold text-neutral-950 hover:bg-neutral-100 disabled:opacity-40"
                   >
                     Próxima <ChevronRight size={15} />
@@ -976,8 +870,8 @@ export default function JogadoresPage() {
         )}
 
         <p className="mt-3 text-[11px] leading-4 text-neutral-500">
-          Overall e valor de mercado são calculados a cada consulta. A busca
-          ignora maiúsculas, minúsculas e acentos.
+          Overall e valor de mercado são calculados a cada consulta. A busca ignora maiúsculas,
+          minúsculas e acentos.
         </p>
       </div>
 
@@ -1027,9 +921,7 @@ export default function JogadoresPage() {
         <ConditionModal
           player={dialog.player}
           clubName={
-            dialog.player.club_id === null
-              ? undefined
-              : clubsById.get(dialog.player.club_id)?.name
+            dialog.player.club_id === null ? undefined : clubsById.get(dialog.player.club_id)?.name
           }
           onClose={() => setDialog(null)}
           onChanged={(condition, marketValue) => {
@@ -1075,9 +967,7 @@ export default function JogadoresPage() {
       {drawer && (
         <PlayerDrawer
           player={players.find((item) => item.id === drawer.id) ?? drawer}
-          club={
-            drawer.club_id === null ? undefined : clubsById.get(drawer.club_id)
-          }
+          club={drawer.club_id === null ? undefined : clubsById.get(drawer.club_id)}
           onClose={() => setDrawer(null)}
           onEdit={() =>
             setDialog({
@@ -1119,13 +1009,8 @@ export default function JogadoresPage() {
 
 /* -------------------------------------------------------------------------- */
 
-function rangeText(
-  min: number | undefined,
-  max: number | undefined,
-  fmt: (n: number) => string,
-) {
-  if (min !== undefined && max !== undefined)
-    return `${fmt(min)} a ${fmt(max)}`;
+function rangeText(min: number | undefined, max: number | undefined, fmt: (n: number) => string) {
+  if (min !== undefined && max !== undefined) return `${fmt(min)} a ${fmt(max)}`;
   if (min !== undefined) return `a partir de ${fmt(min)}`;
   return `até ${fmt(max as number)}`;
 }
@@ -1161,9 +1046,7 @@ function SelectFilter({
         aria-label={label}
         disabled={disabled}
         title={
-          disabled
-            ? "Com a aba “Livres” ativa, o filtro por clube fica desabilitado."
-            : undefined
+          disabled ? "Com a aba “Livres” ativa, o filtro por clube fica desabilitado." : undefined
         }
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -1248,9 +1131,7 @@ function RangeFilter({
     const b = parse(high);
     const invalid = (n: number | undefined) =>
       n !== undefined &&
-      (Number.isNaN(n) ||
-        n < bounds.min ||
-        (bounds.max !== undefined && n > bounds.max));
+      (Number.isNaN(n) || n < bounds.min || (bounds.max !== undefined && n > bounds.max));
     if (invalid(a) || invalid(b))
       return setError(
         bounds.max !== undefined
@@ -1266,31 +1147,18 @@ function RangeFilter({
   const active = min !== undefined || max !== undefined;
 
   return (
-    <div
-      ref={ref}
-      className={`relative shrink-0 ${active ? activeWidth : width}`}
-    >
+    <div ref={ref} className={`relative shrink-0 ${active ? activeWidth : width}`}>
       <button
         type="button"
         aria-expanded={open}
         onClick={toggle}
         className={`${inputClass} flex items-center gap-2 text-left ${active ? "!border-neutral-500" : "text-neutral-600"}`}
       >
-        <Icon
-          size={14}
-          strokeWidth={1.7}
-          className="shrink-0 text-neutral-500"
-        />
+        <Icon size={14} strokeWidth={1.7} className="shrink-0 text-neutral-500" />
         <span className="flex-1 truncate">
-          {active
-            ? `${activeLabel ?? label}: ${rangeText(min, max, format)}`
-            : label}
+          {active ? `${activeLabel ?? label}: ${rangeText(min, max, format)}` : label}
         </span>
-        <ChevronDown
-          size={12}
-          strokeWidth={1.7}
-          className="shrink-0 text-neutral-500"
-        />
+        <ChevronDown size={12} strokeWidth={1.7} className="shrink-0 text-neutral-500" />
       </button>
 
       {open && (
@@ -1329,11 +1197,7 @@ function RangeFilter({
             >
               Limpar
             </button>
-            <button
-              type="button"
-              onClick={apply}
-              className={`${btnPrimary} h-8 px-3 text-[12px]`}
-            >
+            <button type="button" onClick={apply} className={`${btnPrimary} h-8 px-3 text-[12px]`}>
               Aplicar
             </button>
           </div>
@@ -1376,9 +1240,7 @@ function PlayerMenu({
       style={{ right: menu.right, top: menu.top, bottom: menu.bottom }}
       className="fixed z-40 w-[250px] rounded-xl border border-neutral-200 bg-white p-1.5 shadow-lg"
     >
-      <p className="truncate px-2.5 pb-1 pt-1.5 text-[12px] text-neutral-500">
-        {player.name}
-      </p>
+      <p className="truncate px-2.5 pb-1 pt-1.5 text-[12px] text-neutral-500">{player.name}</p>
       {item("details", "Ver detalhes", Eye)}
       {item("edit", "Editar", Pencil)}
       {item("condition", "Alterar condição", HeartPulse)}

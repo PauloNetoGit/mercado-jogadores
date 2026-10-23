@@ -1,22 +1,9 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowUpDown,
-  Check,
-  ChevronDown,
-  ChevronRight,
-  Plus,
-  Shield,
-} from "lucide-react";
+import { ArrowUpDown, Check, ChevronDown, ChevronRight, Plus, Shield } from "lucide-react";
 import { AppShell, useSidebarData } from "@/src/components/AppShell";
 import {
   ErrorCard,
@@ -36,20 +23,19 @@ import {
 import type { Clube } from "@/src/types";
 import { formatMoney } from "@/src/utils/format";
 
-const SORT_OPTIONS: { value: OrdenacaoClubes; label: string; short: string }[] =
-  [
-    { value: "name", label: "Nome", short: "nome" },
-    {
-      value: "net_worth_desc",
-      label: "Patrimônio (maior para o menor)",
-      short: "patrimônio (maior para o menor)",
-    },
-    {
-      value: "net_worth_asc",
-      label: "Patrimônio (menor para o maior)",
-      short: "patrimônio (menor para o maior)",
-    },
-  ];
+const SORT_OPTIONS: { value: OrdenacaoClubes; label: string; short: string }[] = [
+  { value: "name", label: "Nome", short: "nome" },
+  {
+    value: "net_worth_desc",
+    label: "Patrimônio (maior para o menor)",
+    short: "patrimônio (maior para o menor)",
+  },
+  {
+    value: "net_worth_asc",
+    label: "Patrimônio (menor para o maior)",
+    short: "patrimônio (menor para o maior)",
+  },
+];
 
 export default function ClubesPage() {
   const router = useRouter();
@@ -74,8 +60,7 @@ export default function ClubesPage() {
     () => "",
   );
   const modalOpen =
-    manualOpen ||
-    (!queryDismissed && new URLSearchParams(urlSearch).get("novo") === "1");
+    manualOpen || (!queryDismissed && new URLSearchParams(urlSearch).get("novo") === "1");
 
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -126,8 +111,7 @@ export default function ClubesPage() {
   const closeModal = useCallback(() => {
     setManualOpen(false);
     setQueryDismissed(true);
-    if (window.location.search)
-      window.history.replaceState(null, "", "/clubes");
+    if (window.location.search) window.history.replaceState(null, "", "/clubes");
   }, []);
 
   function handleCreated(club: Clube) {
@@ -159,8 +143,7 @@ export default function ClubesPage() {
     setSortOpen(false);
   }
 
-  const selected =
-    SORT_OPTIONS.find((option) => option.value === sort) ?? SORT_OPTIONS[0];
+  const selected = SORT_OPTIONS.find((option) => option.value === sort) ?? SORT_OPTIONS[0];
 
   return (
     <AppShell
@@ -179,12 +162,10 @@ export default function ClubesPage() {
               <Shield size={18} strokeWidth={1.7} />
             </span>
             <div>
-              <h1 className="text-[20px] font-semibold leading-7 tracking-tight">
-                Clubes
-              </h1>
+              <h1 className="text-[20px] font-semibold leading-7 tracking-tight">Clubes</h1>
               <p className="text-[13px] text-neutral-500">
-                Cada clube começa com {formatMoney(CAIXA_INICIAL)} em caixa e
-                sem jogadores. A liga aceita no máximo {MAX_CLUBES} clubes.
+                Cada clube começa com {formatMoney(CAIXA_INICIAL)} em caixa e sem jogadores. A liga
+                aceita no máximo {MAX_CLUBES} clubes.
               </p>
             </div>
           </div>
@@ -193,11 +174,7 @@ export default function ClubesPage() {
             type="button"
             onClick={openModal}
             disabled={atLimit}
-            title={
-              atLimit
-                ? `A liga já possui o limite de ${MAX_CLUBES} clubes.`
-                : undefined
-            }
+            title={atLimit ? `A liga já possui o limite de ${MAX_CLUBES} clubes.` : undefined}
             className="flex h-9 items-center gap-2 rounded-lg bg-[#155DFC] px-4 text-[13px] font-medium text-white shadow-sm transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Plus size={15} strokeWidth={2} />
@@ -225,17 +202,9 @@ export default function ClubesPage() {
                 aria-expanded={sortOpen}
                 className="flex h-9 items-center gap-2 rounded-lg border border-neutral-300 bg-white px-3 text-[13px] shadow-sm transition hover:bg-neutral-50"
               >
-                <ArrowUpDown
-                  size={13}
-                  strokeWidth={1.7}
-                  className="text-neutral-600"
-                />
+                <ArrowUpDown size={13} strokeWidth={1.7} className="text-neutral-600" />
                 Ordenar: {selected.short}
-                <ChevronDown
-                  size={13}
-                  strokeWidth={1.7}
-                  className="text-neutral-600"
-                />
+                <ChevronDown size={13} strokeWidth={1.7} className="text-neutral-600" />
               </button>
 
               {sortOpen && (
@@ -243,9 +212,7 @@ export default function ClubesPage() {
                   role="menu"
                   className="absolute right-0 top-[calc(100%+4px)] z-20 w-[250px] rounded-xl border border-neutral-200 bg-white p-1 shadow-[0_8px_30px_rgba(0,0,0,0.12)]"
                 >
-                  <p className="px-2.5 pb-1 pt-1.5 text-[11px] text-neutral-500">
-                    Ordenar por
-                  </p>
+                  <p className="px-2.5 pb-1 pt-1.5 text-[11px] text-neutral-500">Ordenar por</p>
                   {SORT_OPTIONS.map((option) => {
                     const isSelected = option.value === sort;
                     return (
@@ -273,12 +240,7 @@ export default function ClubesPage() {
 
           {error && clubs.length === 0 && !loading && (
             <div className="border-t border-neutral-200 p-4">
-              <ErrorCard
-                what="os clubes"
-                message={error}
-                onRetry={refresh}
-                retrying={loading}
-              />
+              <ErrorCard what="os clubes" message={error} onRetry={refresh} retrying={loading} />
             </div>
           )}
 
@@ -289,11 +251,7 @@ export default function ClubesPage() {
                 title="Nenhum clube cadastrado"
                 description="Crie o primeiro clube para começar."
               >
-                <button
-                  type="button"
-                  onClick={openModal}
-                  className={stateButtonClass}
-                >
+                <button type="button" onClick={openModal} className={stateButtonClass}>
                   <Plus size={14} strokeWidth={1.8} />
                   Novo clube
                 </button>
@@ -315,22 +273,13 @@ export default function ClubesPage() {
                   <th scope="col" className="px-4 py-2.5 text-left font-normal">
                     Sigla
                   </th>
-                  <th
-                    scope="col"
-                    className="px-4 py-2.5 text-right font-normal"
-                  >
+                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
                     Caixa
                   </th>
-                  <th
-                    scope="col"
-                    className="px-4 py-2.5 text-right font-normal"
-                  >
+                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
                     Valor do elenco
                   </th>
-                  <th
-                    scope="col"
-                    className="px-4 py-2.5 text-right font-normal"
-                  >
+                  <th scope="col" className="px-4 py-2.5 text-right font-normal">
                     Patrimônio
                   </th>
                   <th scope="col" className="w-[120px] px-4 py-2.5">
@@ -389,18 +338,12 @@ export default function ClubesPage() {
         </section>
 
         <p className="mt-3 text-[11px] text-neutral-500">
-          Clubes pelo nome por padrão ou pelo patrimônio, do maior para o menor,
-          com empate desfeito pelo nome.
+          Clubes pelo nome por padrão ou pelo patrimônio, do maior para o menor, com empate desfeito
+          pelo nome.
         </p>
       </div>
 
-      {modalOpen && (
-        <NewClubModal
-          clubs={clubs}
-          onClose={closeModal}
-          onCreated={handleCreated}
-        />
-      )}
+      {modalOpen && <NewClubModal clubs={clubs} onClose={closeModal} onCreated={handleCreated} />}
     </AppShell>
   );
 }

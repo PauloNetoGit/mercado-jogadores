@@ -12,11 +12,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import { Avatar, initialsOf } from "@/src/components/players/Avatar";
-import {
-  clubsService,
-  type EscalacaoAtual,
-  type JogadorDoClube,
-} from "@/src/services/clubs";
+import { clubsService, type EscalacaoAtual, type JogadorDoClube } from "@/src/services/clubs";
 import { POSICOES } from "@/src/services/players";
 import type { Condicao, Formacao, Posicao } from "@/src/types";
 
@@ -74,10 +70,7 @@ const FORMATION_ORDER: Formacao[] = ["3-1", "2-2", "2-1-1", "1-2-1"];
 const DEFAULT_FORMATION: Formacao = "2-1-1";
 
 /** Atributos que contam para cada posição. */
-const ATTRIBUTES: Record<
-  Posicao,
-  { label: string; key: keyof JogadorDoClube }[]
-> = {
+const ATTRIBUTES: Record<Posicao, { label: string; key: keyof JogadorDoClube }[]> = {
   GOL: [{ label: "Defesa", key: "defending" }],
   ZAG: [{ label: "Defesa", key: "defending" }],
   LAT: [
@@ -88,10 +81,7 @@ const ATTRIBUTES: Record<
   ATA: [{ label: "Finalização", key: "shooting" }],
 };
 
-const CONDITIONS: Record<
-  Condicao,
-  { label: string; className: string; dot: string }
-> = {
+const CONDITIONS: Record<Condicao, { label: string; className: string; dot: string }> = {
   APTO: {
     label: "Apto",
     className: "border-green-200 bg-green-50 text-green-700",
@@ -116,8 +106,7 @@ interface Draft {
   assignment: Assignment;
 }
 
-const eligible = (player: JogadorDoClube, slot: Slot) =>
-  slot.positions.includes(player.position);
+const eligible = (player: JogadorDoClube, slot: Slot) => slot.positions.includes(player.position);
 
 /** Distribui os titulares recebidos nas vagas, na ordem, respeitando a posição. */
 function assignStarters(
@@ -129,9 +118,7 @@ function assignStarters(
   return FORMATIONS[formation].slots.map((slot) => {
     const found = starterIds
       .map((id) => players.find((player) => player.id === id))
-      .find(
-        (player) => player && !used.has(player.id) && eligible(player, slot),
-      );
+      .find((player) => player && !used.has(player.id) && eligible(player, slot));
     if (!found) return null;
     used.add(found.id);
     return found.id;
@@ -139,11 +126,7 @@ function assignStarters(
 }
 
 /** Ao trocar de formação, mantém quem ainda cabe em alguma vaga. */
-function remap(
-  from: Assignment,
-  nextFormation: Formacao,
-  players: JogadorDoClube[],
-): Assignment {
+function remap(from: Assignment, nextFormation: Formacao, players: JogadorDoClube[]): Assignment {
   return assignStarters(
     nextFormation,
     from.filter((id): id is number => id !== null),
@@ -208,8 +191,7 @@ function canCloseSomeFormation(available: JogadorDoClube[]) {
   });
 }
 
-const shortName = (name: string) =>
-  name.trim().split(/\s+/).slice(-1)[0] ?? name;
+const shortName = (name: string) => name.trim().split(/\s+/).slice(-1)[0] ?? name;
 
 /* --------------------------------- Aba ------------------------------------ */
 
@@ -244,9 +226,7 @@ export function LineupTab({
       .catch((err: unknown): EscalacaoAtual => {
         if (!cancelled)
           setLoadError(
-            err instanceof Error
-              ? err.message
-              : "Não foi possível carregar a escalação atual.",
+            err instanceof Error ? err.message : "Não foi possível carregar a escalação atual.",
           );
         return { formation: null, starterIds: [] };
       })
@@ -257,9 +237,7 @@ export function LineupTab({
           formation,
           assignment: assignStarters(formation, lineup.starterIds, players),
         };
-        const complete =
-          lineup.formation !== null &&
-          initial.assignment.every((id) => id !== null);
+        const complete = lineup.formation !== null && initial.assignment.every((id) => id !== null);
         if (complete) clearSoldStarter(clubId);
         setSavedFormation(lineup.formation);
         setSoldStarter(complete ? null : readSoldStarter(clubId));
@@ -271,17 +249,12 @@ export function LineupTab({
     };
   }, [clubId, players]);
 
-  const byId = useMemo(
-    () => new Map(players.map((player) => [player.id, player])),
-    [players],
-  );
+  const byId = useMemo(() => new Map(players.map((player) => [player.id, player])), [players]);
 
   if (!draft || !saved) return <LineupSkeleton />;
 
   const { slots } = FORMATIONS[draft.formation];
-  const starters = draft.assignment.map((id) =>
-    id === null ? null : (byId.get(id) ?? null),
-  );
+  const starters = draft.assignment.map((id) => (id === null ? null : (byId.get(id) ?? null)));
   const filled = starters.filter(Boolean).length;
   const complete = filled === slots.length;
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
@@ -291,9 +264,7 @@ export function LineupTab({
   const squadSize = players.length;
   // Considera todo o elenco (titulares e reservas): quem está mal condicionado perde 15% se jogar.
   const weak = players.filter((p) => p.condition === "MAL_CONDICIONADO");
-  const reserves = players.filter(
-    (player) => !draft.assignment.includes(player.id),
-  );
+  const reserves = players.filter((player) => !draft.assignment.includes(player.id));
   // Doentes do elenco: não podem ser escalados. A caixa vermelha aparece sempre que houver algum
   // (e, depois de uma recusa da API, mostra a mensagem dela).
   const sick = players.filter((p) => p.condition === "DOENTE");
@@ -346,11 +317,7 @@ export function LineupTab({
     setSaving(true);
     setSaveError("");
     try {
-      await clubsService.saveLineup(
-        clubId,
-        draft.formation,
-        draft.assignment as number[],
-      );
+      await clubsService.saveLineup(clubId, draft.formation, draft.assignment as number[]);
       clearSoldStarter(clubId);
       setSoldStarter(null);
       setSavedFormation(draft.formation);
@@ -358,17 +325,13 @@ export function LineupTab({
       onSaved();
     } catch (err) {
       const apiMessage =
-        err instanceof Error
-          ? err.message
-          : "Não foi possível salvar a escalação.";
+        err instanceof Error ? err.message : "Não foi possível salvar a escalação.";
       // Se alguém ficou doente depois de a tela abrir, diz quem (a API só diz "Jogadores DOENTE…").
       let message = apiMessage;
       if (/doente/i.test(apiMessage)) {
         const fresh = await clubsService.get(clubId).catch(() => null);
         const sick = (fresh?.players ?? []).filter(
-          (player) =>
-            draft.assignment.includes(player.id) &&
-            player.condition === "DOENTE",
+          (player) => draft.assignment.includes(player.id) && player.condition === "DOENTE",
         );
         if (sick.length > 0) {
           const names = joinNames(sick.map((player) => player.name));
@@ -414,8 +377,8 @@ export function LineupTab({
             <div>
               <h2 className="text-[15px] font-semibold">Titulares</h2>
               <p className="mt-0.5 text-[12px] text-neutral-500">
-                1 goleiro e 4 jogadores de linha, na formação escolhida. Salvar
-                troca os 5 de uma vez.
+                1 goleiro e 4 jogadores de linha, na formação escolhida. Salvar troca os 5 de uma
+                vez.
               </p>
             </div>
             {complete ? (
@@ -425,11 +388,7 @@ export function LineupTab({
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
-                <TriangleAlert
-                  size={16}
-                  strokeWidth={1.8}
-                  className="shrink-0"
-                />
+                <TriangleAlert size={16} strokeWidth={1.8} className="shrink-0" />
                 Incompleta
               </span>
             )}
@@ -452,16 +411,10 @@ export function LineupTab({
               role="alert"
               className="mx-4 mb-4 flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700"
             >
-              <CircleAlert
-                size={16}
-                strokeWidth={1.8}
-                className="mt-0.5 shrink-0"
-              />
+              <CircleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
               <div className="text-[13px] leading-5">
                 <p className="font-medium text-red-800">
-                  {refusal
-                    ? "A escalação foi recusada"
-                    : "Jogador doente não pode ser escalado"}
+                  {refusal ? "A escalação foi recusada" : "Jogador doente não pode ser escalado"}
                 </p>
                 <p>{refusal ? saveError : sickMessage}</p>
               </div>
@@ -472,8 +425,8 @@ export function LineupTab({
           <div className="border-t border-neutral-200 px-4 py-4">
             <p className="text-[13px] font-medium">Formação</p>
             <p className="mt-0.5 text-[12px] text-neutral-500">
-              Os números contam os jogadores de linha de trás para frente. O
-              goleiro fica fora da conta.
+              Os números contam os jogadores de linha de trás para frente. O goleiro fica fora da
+              conta.
             </p>
             <div
               role="radiogroup"
@@ -504,9 +457,7 @@ export function LineupTab({
                             selected ? "border-[#155DFC]" : "border-neutral-400"
                           }`}
                         >
-                          {selected && (
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#155DFC]" />
-                          )}
+                          {selected && <span className="h-1.5 w-1.5 rounded-full bg-[#155DFC]" />}
                         </span>
                         {formation}
                       </span>
@@ -534,10 +485,7 @@ export function LineupTab({
                   <th scope="col" className="px-3 py-2.5 text-left font-normal">
                     Condição
                   </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-2.5 text-right font-normal"
-                  >
+                  <th scope="col" className="px-3 py-2.5 text-right font-normal">
                     Overall
                   </th>
                   <th scope="col" className="px-4 py-2.5 text-left font-normal">
@@ -548,47 +496,34 @@ export function LineupTab({
               <tbody>
                 {slots.map((slot, index) => {
                   const player = starters[index];
-                  const condition = player
-                    ? CONDITIONS[player.condition]
-                    : null;
+                  const condition = player ? CONDITIONS[player.condition] : null;
                   const takenElsewhere = new Set(
-                    draft.assignment.filter(
-                      (id, i) => i !== index && id !== null,
-                    ),
+                    draft.assignment.filter((id, i) => i !== index && id !== null),
                   );
                   const options = players
-                    .filter(
-                      (p) => eligible(p, slot) && !takenElsewhere.has(p.id),
-                    )
+                    .filter((p) => eligible(p, slot) && !takenElsewhere.has(p.id))
                     .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
                   // Ninguém que possa ocupar a vaga (todos já escalados, doentes ou de outra posição).
                   const noOneAvailable =
-                    !player &&
-                    options.every((option) => option.condition === "DOENTE");
+                    !player && options.every((option) => option.condition === "DOENTE");
 
                   return (
                     <tr key={index} className="border-t border-neutral-200">
                       <td className="px-4 py-3">
                         <p className="font-medium">{slot.label}</p>
-                        <p className="text-[11px] text-neutral-500">
-                          {slot.hint}
-                        </p>
+                        <p className="text-[11px] text-neutral-500">{slot.hint}</p>
                       </td>
                       <td className="px-3 py-3">
                         <div className="relative w-[230px]">
                           <select
                             value={player?.id ?? ""}
-                            onChange={(event) =>
-                              choosePlayer(index, event.target.value)
-                            }
+                            onChange={(event) => choosePlayer(index, event.target.value)}
                             disabled={noOneAvailable}
                             aria-label={`Titular da vaga ${slot.label} ${index + 1}`}
                             className="h-9 w-full appearance-none rounded-lg border border-neutral-300 bg-white pl-3 pr-8 text-[13px] outline-none transition focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC]/15 disabled:bg-neutral-50 disabled:text-neutral-400"
                           >
                             <option value="">
-                              {noOneAvailable
-                                ? `Sem ${slot.hint}`
-                                : "Escolher jogador"}
+                              {noOneAvailable ? `Sem ${slot.hint}` : "Escolher jogador"}
                             </option>
                             {options.map((option) => (
                               <option
@@ -597,9 +532,7 @@ export function LineupTab({
                                 disabled={option.condition === "DOENTE"}
                               >
                                 {option.name} ({option.position})
-                                {option.condition === "DOENTE"
-                                  ? " · Doente"
-                                  : ""}
+                                {option.condition === "DOENTE" ? " · Doente" : ""}
                               </option>
                             ))}
                           </select>
@@ -629,19 +562,14 @@ export function LineupTab({
                       <td className="px-4 py-3">
                         {player ? (
                           <div className="flex flex-wrap gap-x-3 gap-y-0.5">
-                            {ATTRIBUTES[player.position].map(
-                              ({ label, key }) => (
-                                <span
-                                  key={label}
-                                  className="whitespace-nowrap text-neutral-600"
-                                >
-                                  {label}{" "}
-                                  <b className="font-semibold text-neutral-950 tabular-nums">
-                                    {String(player[key])}
-                                  </b>
-                                </span>
-                              ),
-                            )}
+                            {ATTRIBUTES[player.position].map(({ label, key }) => (
+                              <span key={label} className="whitespace-nowrap text-neutral-600">
+                                {label}{" "}
+                                <b className="font-semibold text-neutral-950 tabular-nums">
+                                  {String(player[key])}
+                                </b>
+                              </span>
+                            ))}
                           </div>
                         ) : (
                           <span className="text-neutral-400">—</span>
@@ -659,21 +587,15 @@ export function LineupTab({
               role="status"
               className="mx-4 mb-3 mt-1 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3.5 py-3 text-amber-800"
             >
-              <TriangleAlert
-                size={15}
-                strokeWidth={1.8}
-                className="mt-0.5 shrink-0"
-              />
+              <TriangleAlert size={15} strokeWidth={1.8} className="mt-0.5 shrink-0" />
               <div className="text-[12px] leading-4">
                 <p className="font-semibold">
                   {joinNames(weak.map((p) => p.name))}{" "}
-                  {weak.length === 1
-                    ? "está mal condicionado"
-                    : "estão mal condicionados"}
+                  {weak.length === 1 ? "está mal condicionado" : "estão mal condicionados"}
                 </p>
                 <p className="mt-0.5">
-                  {weak.length === 1 ? "Pode jogar" : "Podem jogar"}, mas cada
-                  atributo vale 15% a menos durante a partida.
+                  {weak.length === 1 ? "Pode jogar" : "Podem jogar"}, mas cada atributo vale 15% a
+                  menos durante a partida.
                 </p>
               </div>
             </div>
@@ -681,9 +603,8 @@ export function LineupTab({
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 px-4 py-3">
             <p className="max-w-[420px] text-[11px] leading-4 text-neutral-500">
-              A escalação vale até ser trocada. Titular vendido ou que fica
-              doente sai dela, e o clube só volta a jogar depois de escalar de
-              novo.
+              A escalação vale até ser trocada. Titular vendido ou que fica doente sai dela, e o
+              clube só volta a jogar depois de escalar de novo.
             </p>
             <div className="flex gap-2">
               <button
@@ -726,9 +647,8 @@ export function LineupTab({
             <Pitch slots={slots} starters={starters} />
             <p className="mt-3 flex items-start gap-2 rounded-lg bg-neutral-50 px-3 py-2.5 text-[11px] leading-4 text-neutral-600">
               <Swords size={13} strokeWidth={1.7} className="mt-0.5 shrink-0" />
-              Na partida, atacam os 3 jogadores de linha mais avançados e
-              defendem o goleiro e os 2 mais recuados. É gol quando o ataque é
-              maior que a defesa.
+              Na partida, atacam os 3 jogadores de linha mais avançados e defendem o goleiro e os 2
+              mais recuados. É gol quando o ataque é maior que a defesa.
             </p>
           </section>
 
@@ -748,18 +668,11 @@ export function LineupTab({
                 {reserves.map((player) => {
                   const condition = CONDITIONS[player.condition];
                   return (
-                    <li
-                      key={player.id}
-                      className="flex items-center gap-2.5 px-4 py-2.5"
-                    >
+                    <li key={player.id} className="flex items-center gap-2.5 px-4 py-2.5">
                       <Avatar id={player.id} name={player.name} size={28} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-medium">
-                          {player.name}
-                        </p>
-                        <p className="text-[11px] text-neutral-500">
-                          {POSICOES[player.position]}
-                        </p>
+                        <p className="truncate text-[13px] font-medium">{player.name}</p>
+                        <p className="text-[11px] text-neutral-500">{POSICOES[player.position]}</p>
                       </div>
                       <span
                         className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2 py-0.5 text-[11px] font-medium ${condition.className}`}
@@ -784,10 +697,9 @@ export function LineupTab({
         </div>
 
         <p className="text-[11px] leading-4 text-neutral-500 lg:col-span-2">
-          Escalação na formação {draft.formation}, com os titulares na ordem do
-          elenco. Salvar troca a formação e os 5 titulares de uma vez; titular
-          doente, fora do elenco ou posições que não fecham a formação são
-          recusados (RN19).
+          Escalação na formação {draft.formation}, com os titulares na ordem do elenco. Salvar troca
+          a formação e os 5 titulares de uma vez; titular doente, fora do elenco ou posições que não
+          fecham a formação são recusados (RN19).
         </p>
       </div>
     </>
@@ -816,13 +728,7 @@ function MiniField({ slots }: { slots: Slot[] }) {
   const rows = rowsOf(slots, slots);
   const ys: Record<Line, number> = { att: 9, mid: 18, def: 27, gk: 34 };
   return (
-    <svg
-      width="30"
-      height="40"
-      viewBox="0 0 30 40"
-      aria-hidden
-      className="shrink-0 rounded-md"
-    >
+    <svg width="30" height="40" viewBox="0 0 30 40" aria-hidden className="shrink-0 rounded-md">
       <rect width="30" height="40" rx="4" fill="#1f6b3a" />
       <rect
         x="2"
@@ -834,14 +740,7 @@ function MiniField({ slots }: { slots: Slot[] }) {
         stroke="#ffffff55"
         strokeWidth="0.8"
       />
-      <line
-        x1="2"
-        y1="20"
-        x2="28"
-        y2="20"
-        stroke="#ffffff55"
-        strokeWidth="0.8"
-      />
+      <line x1="2" y1="20" x2="28" y2="20" stroke="#ffffff55" strokeWidth="0.8" />
       {rows.flatMap((row) =>
         row.items.map((_, i) => (
           <circle
@@ -857,13 +756,7 @@ function MiniField({ slots }: { slots: Slot[] }) {
   );
 }
 
-function Pitch({
-  slots,
-  starters,
-}: {
-  slots: Slot[];
-  starters: (JogadorDoClube | null)[];
-}) {
+function Pitch({ slots, starters }: { slots: Slot[]; starters: (JogadorDoClube | null)[] }) {
   const order: Line[] = ["att", "mid", "def", "gk"];
   const entries = slots.map((slot, index) => ({
     slot,
@@ -879,8 +772,7 @@ function Pitch({
     <div
       className="relative mt-3 flex aspect-[4/4.4] flex-col justify-between overflow-hidden rounded-lg px-2 py-4"
       style={{
-        background:
-          "repeating-linear-gradient(180deg, #1f6b3a 0 12.5%, #1a5c32 12.5% 25%)",
+        background: "repeating-linear-gradient(180deg, #1f6b3a 0 12.5%, #1a5c32 12.5% 25%)",
       }}
     >
       {/* Marcações */}
@@ -902,10 +794,7 @@ function Pitch({
       />
 
       {rows.map((row) => (
-        <div
-          key={row.line}
-          className="relative flex items-start justify-around"
-        >
+        <div key={row.line} className="relative flex items-start justify-around">
           {row.entries.map(({ slot, player }, index) => (
             <div
               key={player?.id ?? `${row.line}-${index}`}
@@ -939,10 +828,7 @@ function Pitch({
 
 function LineupSkeleton() {
   return (
-    <div
-      aria-hidden
-      className="grid animate-pulse gap-4 lg:grid-cols-[minmax(0,1fr)_300px]"
-    >
+    <div aria-hidden className="grid animate-pulse gap-4 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div className="h-[560px] rounded-xl bg-neutral-100" />
       <div className="space-y-4">
         <div className="h-[340px] rounded-xl bg-neutral-100" />

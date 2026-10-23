@@ -84,14 +84,11 @@ export function HistoryTab({
   const [everything, setEverything] = useState<Transacao[]>([]);
   const [exporting, setExporting] = useState(false);
 
-  const types: TipoTransacao[] | undefined =
-    showBuy && showSell ? undefined : showBuy ? ["COMPRA"] : ["VENDA"];
-  const typesKey = types?.join(",") ?? "";
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- `types` muda de identidade a cada render; `typesKey` a representa.
-  const filter: FiltroHistorico = useMemo(
-    () => ({ types, playerId }),
-    [typesKey, playerId],
+  const types = useMemo<TipoTransacao[] | undefined>(
+    () => (showBuy && showSell ? undefined : showBuy ? ["COMPRA"] : ["VENDA"]),
+    [showBuy, showSell],
   );
+  const filter: FiltroHistorico = useMemo(() => ({ types, playerId }), [types, playerId]);
   const filtered = Boolean(types) || playerId !== null;
   const key = `${clubId}|${types?.join(",") ?? ""}|${playerId ?? ""}|${retry}`;
   const loading = !loaded || loaded.key !== key;
@@ -112,15 +109,12 @@ export function HistoryTab({
             err instanceof TypeError
               ? {
                   kind: "network",
-                  message:
-                    "A API não respondeu. Verifique a conexão e tente de novo.",
+                  message: "A API não respondeu. Verifique a conexão e tente de novo.",
                 }
               : {
                   kind: "refused",
                   message:
-                    err instanceof Error
-                      ? err.message
-                      : "Não foi possível carregar o histórico.",
+                    err instanceof Error ? err.message : "Não foi possível carregar o histórico.",
                 },
         });
       });
@@ -150,8 +144,7 @@ export function HistoryTab({
     // A lista vem da mais recente para a mais antiga: vale o nome mais recente.
     for (const tx of everything)
       if (!seen.has(tx.player_id)) seen.set(tx.player_id, tx.player_name);
-    if (playerId !== null && !seen.has(playerId))
-      seen.set(playerId, playerName);
+    if (playerId !== null && !seen.has(playerId)) seen.set(playerId, playerName);
     return [...seen.entries()]
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
@@ -260,8 +253,7 @@ export function HistoryTab({
           : `Com o filtro “Venda”, os totais consideram só as vendas (total pago em compras ${formatMoney(data.summary.total_spent)}).`,
       );
     }
-    if (parts.length > 0)
-      return `${parts.join(" ")} O CSV usa os mesmos filtros da tela.`;
+    if (parts.length > 0) return `${parts.join(" ")} O CSV usa os mesmos filtros da tela.`;
     return `Os totais respeitam os filtros. ${formatMoney(CAIXA_INICIAL)} + soma das variações = caixa atual (${formatMoney(cash)}).`;
   }
 
@@ -282,12 +274,10 @@ export function HistoryTab({
         <div className="px-4 pb-4 pt-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="text-[15px] font-semibold">
-                Histórico de transações
-              </h2>
+              <h2 className="text-[15px] font-semibold">Histórico de transações</h2>
               <p className="mt-0.5 text-[12px] text-neutral-500">
-                Da mais recente para a mais antiga, com o nome e os valores do
-                momento de cada operação.
+                Da mais recente para a mais antiga, com o nome e os valores do momento de cada
+                operação.
               </p>
             </div>
             <button
@@ -309,16 +299,8 @@ export function HistoryTab({
           {/* Filtros */}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="mr-0.5 text-[13px] text-neutral-500">Tipo</span>
-            <TypeChip
-              label="Compra"
-              checked={showBuy}
-              onClick={() => toggleType("COMPRA")}
-            />
-            <TypeChip
-              label="Venda"
-              checked={showSell}
-              onClick={() => toggleType("VENDA")}
-            />
+            <TypeChip label="Compra" checked={showBuy} onClick={() => toggleType("COMPRA")} />
+            <TypeChip label="Venda" checked={showSell} onClick={() => toggleType("VENDA")} />
 
             <span aria-hidden className="mx-1 h-6 w-px bg-neutral-200" />
 
@@ -362,15 +344,9 @@ export function HistoryTab({
               role="alert"
               className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700"
             >
-              <CircleAlert
-                size={16}
-                strokeWidth={1.8}
-                className="mt-0.5 shrink-0"
-              />
+              <CircleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
               <div className="flex-1 text-[13px] leading-5">
-                <p className="font-medium text-red-800">
-                  O filtro foi recusado
-                </p>
+                <p className="font-medium text-red-800">O filtro foi recusado</p>
                 <p>{error.message}</p>
               </div>
             </div>
@@ -386,10 +362,7 @@ export function HistoryTab({
         ) : !data ? (
           <TableSkeleton />
         ) : (
-          <div
-            className={`transition-opacity ${loading ? "opacity-60" : ""}`}
-            aria-busy={loading}
-          >
+          <div className={`transition-opacity ${loading ? "opacity-60" : ""}`} aria-busy={loading}>
             {data.data.length === 0 ? (
               <EmptyState filtered={filtered} onClear={clearFilters} />
             ) : (
@@ -400,21 +373,11 @@ export function HistoryTab({
                       <th className="px-4 py-2.5 font-medium">Data e hora</th>
                       <th className="px-3 py-2.5 font-medium">Tipo</th>
                       <th className="px-3 py-2.5 font-medium">Jogador</th>
-                      <th className="px-3 py-2.5 text-right font-medium">
-                        Valor
-                      </th>
-                      <th className="px-3 py-2.5 text-right font-medium">
-                        Taxa ou comissão
-                      </th>
-                      <th className="px-3 py-2.5 text-right font-medium">
-                        Multa
-                      </th>
-                      <th className="px-3 py-2.5 text-right font-medium">
-                        Lucro
-                      </th>
-                      <th className="px-4 py-2.5 text-right font-medium">
-                        Variação do caixa
-                      </th>
+                      <th className="px-3 py-2.5 text-right font-medium">Valor</th>
+                      <th className="px-3 py-2.5 text-right font-medium">Taxa ou comissão</th>
+                      <th className="px-3 py-2.5 text-right font-medium">Multa</th>
+                      <th className="px-3 py-2.5 text-right font-medium">Lucro</th>
+                      <th className="px-4 py-2.5 text-right font-medium">Variação do caixa</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -428,43 +391,23 @@ export function HistoryTab({
 
             {/* Totais (respeitam os filtros) */}
             <div className="grid grid-cols-2 gap-px border-t border-neutral-200 bg-neutral-200 lg:grid-cols-5">
-              <Summary
-                icon={ShoppingCart}
-                label="Total pago em compras"
-                hint="Valor + taxa"
-              >
+              <Summary icon={ShoppingCart} label="Total pago em compras" hint="Valor + taxa">
                 {formatMoney(data.summary.total_spent)}
               </Summary>
-              <Summary
-                icon={HandCoins}
-                label="Total recebido em vendas"
-                hint="Crédito líquido"
-              >
+              <Summary icon={HandCoins} label="Total recebido em vendas" hint="Crédito líquido">
                 {formatMoney(data.summary.total_received)}
               </Summary>
-              <Summary
-                icon={CircleCheck}
-                label="Taxas e comissões"
-                hint="Somadas"
-              >
+              <Summary icon={CircleCheck} label="Taxas e comissões" hint="Somadas">
                 {formatMoney(data.summary.total_fees)}
               </Summary>
-              <Summary
-                icon={TriangleAlert}
-                label="Multas"
-                hint="Por fidelidade"
-              >
+              <Summary icon={TriangleAlert} label="Multas" hint="Por fidelidade">
                 {formatMoney(data.summary.total_penalties)}
               </Summary>
               <Summary
                 icon={data.summary.total_profit < 0 ? TrendingDown : TrendingUp}
                 label="Lucro total"
                 hint="Soma dos lucros, com sinal"
-                valueClass={
-                  data.summary.total_profit === 0
-                    ? ""
-                    : tone(data.summary.total_profit)
-                }
+                valueClass={data.summary.total_profit === 0 ? "" : tone(data.summary.total_profit)}
                 wide
               >
                 {signed(data.summary.total_profit)}
@@ -474,9 +417,7 @@ export function HistoryTab({
         )}
       </div>
 
-      {note && (
-        <p className="mt-4 text-[12px] leading-5 text-neutral-500">{note}</p>
-      )}
+      {note && <p className="mt-4 text-[12px] leading-5 text-neutral-500">{note}</p>}
     </div>
   );
 }
@@ -505,9 +446,7 @@ function TypeChip({
       <span
         aria-hidden
         className={`flex h-4 w-4 items-center justify-center rounded border ${
-          checked
-            ? "border-[#155DFC] bg-[#155DFC] text-white"
-            : "border-neutral-300 bg-white"
+          checked ? "border-[#155DFC] bg-[#155DFC] text-white" : "border-neutral-300 bg-white"
         }`}
       >
         {checked && <Check size={11} strokeWidth={3} />}
@@ -549,15 +488,11 @@ function Row({ tx }: { tx: Transacao }) {
           <span className="font-medium">{tx.player_name}</span>
         </div>
       </td>
-      <td className="px-3 py-3.5 text-right tabular-nums">
-        {formatMoney(tx.value)}
-      </td>
+      <td className="px-3 py-3.5 text-right tabular-nums">{formatMoney(tx.value)}</td>
       <td className={`px-3 py-3.5 text-right tabular-nums ${muted(tx.fee)}`}>
         {formatMoney(tx.fee)}
       </td>
-      <td
-        className={`px-3 py-3.5 text-right tabular-nums ${muted(tx.penalty)}`}
-      >
+      <td className={`px-3 py-3.5 text-right tabular-nums ${muted(tx.penalty)}`}>
         {formatMoney(tx.penalty)}
       </td>
       <td
@@ -567,9 +502,7 @@ function Row({ tx }: { tx: Transacao }) {
       >
         {tx.profit === null ? "–" : signed(tx.profit)}
       </td>
-      <td
-        className={`px-4 py-3.5 text-right font-semibold tabular-nums ${tone(tx.cash_change)}`}
-      >
+      <td className={`px-4 py-3.5 text-right font-semibold tabular-nums ${tone(tx.cash_change)}`}>
         {signed(tx.cash_change)}
       </td>
     </tr>
@@ -592,39 +525,25 @@ function Summary({
   wide?: boolean;
 }) {
   return (
-    <div
-      className={`bg-neutral-50 px-4 py-3.5 ${wide ? "col-span-2 lg:col-span-1" : ""}`}
-    >
+    <div className={`bg-neutral-50 px-4 py-3.5 ${wide ? "col-span-2 lg:col-span-1" : ""}`}>
       <p className="flex items-center gap-1.5 text-[12px] text-neutral-500">
         <Icon size={13} strokeWidth={1.7} />
         {label}
       </p>
-      <p
-        className={`mt-1.5 text-[20px] font-semibold tabular-nums ${valueClass}`}
-      >
-        {children}
-      </p>
+      <p className={`mt-1.5 text-[20px] font-semibold tabular-nums ${valueClass}`}>{children}</p>
       <p className="mt-0.5 text-[12px] text-neutral-500">{hint}</p>
     </div>
   );
 }
 
-function EmptyState({
-  filtered,
-  onClear,
-}: {
-  filtered: boolean;
-  onClear: () => void;
-}) {
+function EmptyState({ filtered, onClear }: { filtered: boolean; onClear: () => void }) {
   return (
     <div className="flex flex-col items-center border-t border-neutral-200 px-6 py-16 text-center">
       <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-neutral-100 text-neutral-600">
         <History size={20} strokeWidth={1.6} />
       </span>
       <p className="mt-5 text-[15px] font-semibold">
-        {filtered
-          ? "Nenhuma transação com esses filtros"
-          : "Nenhuma transação ainda"}
+        {filtered ? "Nenhuma transação com esses filtros" : "Nenhuma transação ainda"}
       </p>
       <p className="mt-2 max-w-[400px] text-[13px] leading-5 text-neutral-500">
         {filtered

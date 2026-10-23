@@ -95,18 +95,14 @@ export const LIMITE_ELENCO = 12;
 export const TETO_MULTA = 10;
 
 export const clubsService = {
-  list: (sort: OrdenacaoClubes = "name") =>
-    api.get<Clube[]>(`/clubs?sort=${sort}`),
+  list: (sort: OrdenacaoClubes = "name") => api.get<Clube[]>(`/clubs?sort=${sort}`),
 
   get: (id: number | string) => api.get<ClubeDetalhe>(`/clubs/${id}`),
 
-  create: (body: { name: string; acronym: string }) =>
-    api.post<Clube>("/clubs", body),
+  create: (body: { name: string; acronym: string }) => api.post<Clube>("/clubs", body),
 
   transactionsCount: async (id: number | string) => {
-    const response = await api.get<{ data: unknown[] }>(
-      `/clubs/${id}/transactions`,
-    );
+    const response = await api.get<{ data: unknown[] }>(`/clubs/${id}/transactions`);
     return response.data.length;
   },
 
@@ -158,8 +154,7 @@ export const clubsService = {
     }
   },
 
-  sell: (playerId: number) =>
-    api.post<ResultadoVenda>(`/players/${playerId}/sell`, {}),
+  sell: (playerId: number) => api.post<ResultadoVenda>(`/players/${playerId}/sell`, {}),
 
   matches: () => api.get<ResumoPartida[]>("/matches"),
 

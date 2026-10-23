@@ -42,9 +42,7 @@ export function Toast({ toast, onClose, durationMs = 6000 }: ToastProps) {
           className={`mt-0.5 shrink-0 ${isError ? "text-red-600" : "text-green-700"}`}
         />
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-semibold leading-5 text-neutral-950">
-            {toast.title}
-          </p>
+          <p className="text-[13px] font-semibold leading-5 text-neutral-950">{toast.title}</p>
           {toast.description && (
             <p className="mt-0.5 text-[12px] leading-[18px] text-neutral-500">
               {toast.description}

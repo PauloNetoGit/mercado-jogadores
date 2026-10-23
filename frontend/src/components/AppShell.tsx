@@ -50,11 +50,8 @@ export function useSidebarData() {
       setData((previous) => ({
         clubs: clubs.status === "fulfilled" ? clubs.value : previous.clubs,
         playersTotal:
-          playersTotal.status === "fulfilled"
-            ? playersTotal.value
-            : previous.playersTotal,
-        matches:
-          matches.status === "fulfilled" ? matches.value : previous.matches,
+          playersTotal.status === "fulfilled" ? playersTotal.value : previous.playersTotal,
+        matches: matches.status === "fulfilled" ? matches.value : previous.matches,
       }));
     });
 
@@ -117,10 +114,7 @@ export function AppShell({
   }
 
   return (
-    <div
-      className="min-h-screen bg-[#fafafa] text-neutral-950"
-      style={{ fontFamily: FONT_STACK }}
-    >
+    <div className="min-h-screen bg-[#fafafa] text-neutral-950" style={{ fontFamily: FONT_STACK }}>
       {menuOpen && (
         <button
           type="button"
@@ -147,9 +141,7 @@ export function AppShell({
           />
           <div className="min-w-0 leading-tight">
             <span className="block text-[13px] font-semibold">Passe</span>
-            <span className="block text-[11px] text-neutral-500">
-              Gestão da liga
-            </span>
+            <span className="block text-[11px] text-neutral-500">Gestão da liga</span>
           </div>
         </div>
 
@@ -158,9 +150,7 @@ export function AppShell({
           className="flex-1 space-y-4 overflow-y-auto px-3 py-2 text-[13px]"
         >
           <div>
-            <p className="px-2 pb-1.5 text-[11px] font-medium text-neutral-500">
-              Mercado
-            </p>
+            <p className="px-2 pb-1.5 text-[11px] font-medium text-neutral-500">Mercado</p>
             <NavLink
               href="/jogadores"
               icon={<Users size={15} strokeWidth={1.7} />}
@@ -180,9 +170,7 @@ export function AppShell({
           </div>
 
           <div>
-            <p className="px-2 pb-1.5 text-[11px] font-medium text-neutral-500">
-              Liga
-            </p>
+            <p className="px-2 pb-1.5 text-[11px] font-medium text-neutral-500">Liga</p>
             <NavLink
               href="/partidas"
               icon={<Swords size={15} strokeWidth={1.7} />}
@@ -241,9 +229,7 @@ export function AppShell({
                 >
                   <span
                     className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[10px] font-semibold ${
-                      isActive
-                        ? "bg-[#155DFC] text-white"
-                        : "bg-neutral-200/70 text-neutral-800"
+                      isActive ? "bg-[#155DFC] text-white" : "bg-neutral-200/70 text-neutral-800"
                     }`}
                   >
                     {club.name.slice(0, 1).toUpperCase()}
@@ -262,9 +248,7 @@ export function AppShell({
                 <Trophy size={15} strokeWidth={1.6} />
               </span>
               <div className="min-w-0 leading-tight">
-                <p className="truncate text-[12px] font-semibold">
-                  Liga Fictícia 2026
-                </p>
+                <p className="truncate text-[12px] font-semibold">Liga Fictícia 2026</p>
                 <p className="truncate text-[11px] text-neutral-500">
                   {sidebar.clubs.length} clubes · {sidebar.playersTotal} jogadores
                 </p>
@@ -324,10 +308,7 @@ export function AppShell({
                         }`}
                       >
                         {crumb.href && !isLast ? (
-                          <Link
-                            href={crumb.href}
-                            className="transition hover:text-neutral-900"
-                          >
+                          <Link href={crumb.href} className="transition hover:text-neutral-900">
                             {crumb.label}
                           </Link>
                         ) : (
@@ -339,11 +320,7 @@ export function AppShell({
                           </span>
                         )}
                         {!isLast && (
-                          <ChevronRight
-                            size={13}
-                            strokeWidth={1.6}
-                            className="shrink-0"
-                          />
+                          <ChevronRight size={13} strokeWidth={1.6} className="shrink-0" />
                         )}
                       </li>
                     );
@@ -404,13 +381,9 @@ function NavLink({
           : "border-transparent text-neutral-800 hover:bg-neutral-200/50"
       }`}
     >
-      <span className={active ? "text-[#155DFC]" : "text-neutral-600"}>
-        {icon}
-      </span>
+      <span className={active ? "text-[#155DFC]" : "text-neutral-600"}>{icon}</span>
       <span>{label}</span>
-      {count !== undefined && (
-        <span className="ml-auto text-[12px] text-neutral-500">{count}</span>
-      )}
+      {count !== undefined && <span className="ml-auto text-[12px] text-neutral-500">{count}</span>}
     </Link>
   );
 }

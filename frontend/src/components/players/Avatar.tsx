@@ -18,15 +18,7 @@ export function initialsOf(name: string) {
 }
 
 /** Iniciais sobre um fundo pastel, sempre o mesmo para o mesmo jogador. */
-export function Avatar({
-  id,
-  name,
-  size = 32,
-}: {
-  id: number;
-  name: string;
-  size?: number;
-}) {
+export function Avatar({ id, name, size = 32 }: { id: number; name: string; size?: number }) {
   const tone = TONES[id % TONES.length];
   return (
     <span

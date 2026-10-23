@@ -1,22 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Calendar,
-  CircleAlert,
-  Clock,
-  Info,
-  Loader2,
-  RefreshCw,
-  ShoppingCart,
-} from "lucide-react";
-import {
-  Modal,
-  ModalActions,
-  btnPrimary,
-  btnSecondary,
-  inputClass,
-} from "@/src/components/Modal";
+import { Calendar, CircleAlert, Clock, Info, Loader2, RefreshCw, ShoppingCart } from "lucide-react";
+import { Modal, ModalActions, btnPrimary, btnSecondary, inputClass } from "@/src/components/Modal";
 import { Avatar } from "@/src/components/players/Avatar";
 import type { PurchaseDoneData } from "@/src/components/players/PurchaseDoneModal";
 import { POSICOES, playersService } from "@/src/services/players";
@@ -32,11 +18,9 @@ import { formatMoney } from "@/src/utils/format";
 import type { Clube, Jogador } from "@/src/types";
 
 const MIN_BUYING_MS = 1000;
-const wait = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-const invalidClass =
-  "!border-red-500 focus:!border-red-500 focus:!ring-red-500/15";
+const invalidClass = "!border-red-500 focus:!border-red-500 focus:!ring-red-500/15";
 
 export function BuyModal({
   player,
@@ -102,15 +86,11 @@ export function BuyModal({
         err instanceof TypeError
           ? {
               kind: "network",
-              message:
-                "A compra não foi confirmada. Verifique a conexão e tente de novo.",
+              message: "A compra não foi confirmada. Verifique a conexão e tente de novo.",
             }
           : {
               kind: "refused",
-              message:
-                err instanceof Error
-                  ? err.message
-                  : "Não foi possível comprar o jogador.",
+              message: err instanceof Error ? err.message : "Não foi possível comprar o jogador.",
             },
       );
       setSubmitting(false);
@@ -169,8 +149,7 @@ export function BuyModal({
           <div className="min-w-0 flex-1">
             <p className="truncate text-[13px] font-medium">{player.name}</p>
             <p className="text-[11px] text-neutral-500">
-              {player.position} · {POSICOES[player.position]} · {player.age}{" "}
-              anos
+              {player.position} · {POSICOES[player.position]} · {player.age} anos
             </p>
           </div>
           <div className="text-right">
@@ -200,14 +179,12 @@ export function BuyModal({
             ))}
           </select>
           {clubError ? (
-            <span className="mt-1 block text-[11px] font-normal text-red-600">
-              {clubError}
-            </span>
+            <span className="mt-1 block text-[11px] font-normal text-red-600">{clubError}</span>
           ) : (
             club && (
               <span className="mt-1 block text-[11px] font-normal text-neutral-500">
-                Caixa atual: {formatMoney(club.cash)}. O custo total (valor +
-                taxa) pode ir até 50% do caixa.
+                Caixa atual: {formatMoney(club.cash)}. O custo total (valor + taxa) pode ir até 50%
+                do caixa.
               </span>
             )
           )}
@@ -246,39 +223,26 @@ export function BuyModal({
             </label>
           </div>
           {fieldErrors.date || fieldErrors.time ? (
-            <p className="mt-1 text-[11px] text-red-600">
-              {fieldErrors.date ?? fieldErrors.time}
-            </p>
+            <p className="mt-1 text-[11px] text-red-600">{fieldErrors.date ?? fieldErrors.time}</p>
           ) : (
             <p className="mt-1 text-[11px] text-neutral-500">
-              Depois do momento da compra e até 1.095 dias. Horário de Brasília;
-              enviado com o fuso (-03:00).
+              Depois do momento da compra e até 1.095 dias. Horário de Brasília; enviado com o fuso
+              (-03:00).
             </p>
           )}
         </div>
 
         <p className="flex gap-2 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-[11.5px] leading-[17px] text-neutral-600">
-          <Info size={13} className="mt-0.5 shrink-0" />A taxa é de 5% do valor
-          de mercado, só quando ele passa de 30,00. Taxa, custo e novo caixa são
-          calculados ao confirmar.
+          <Info size={13} className="mt-0.5 shrink-0" />A taxa é de 5% do valor de mercado, só
+          quando ele passa de 30,00. Taxa, custo e novo caixa são calculados ao confirmar.
         </p>
       </div>
 
       <ModalActions>
-        <button
-          type="button"
-          onClick={onClose}
-          disabled={submitting}
-          className={btnSecondary}
-        >
+        <button type="button" onClick={onClose} disabled={submitting} className={btnSecondary}>
           Cancelar
         </button>
-        <button
-          type="button"
-          onClick={submit}
-          disabled={submitting}
-          className={btnPrimary}
-        >
+        <button type="button" onClick={submit} disabled={submitting} className={btnPrimary}>
           {submitting ? (
             <Loader2 size={14} className="animate-spin" />
           ) : failure?.kind === "network" ? (

@@ -116,20 +116,15 @@ export default function Home() {
 
     async function loadDashboard() {
       try {
-        const [
-          playersResponse,
-          freeResponse,
-          clubsResponse,
-          matchesResponse,
-          standings,
-        ] = await Promise.all([
-          api.get<PlayersResponse>("/players?page=1&limit=1"),
-          api.get<PlayersResponse>("/players?page=1&limit=1&free=true"),
-          api.get<Club[]>("/clubs"),
-          api.get<Match[]>("/matches"),
-          // A classificação só enfeita o selo: se falhar, o resto continua.
-          api.get<Standing[]>("/standings").catch(() => [] as Standing[]),
-        ]);
+        const [playersResponse, freeResponse, clubsResponse, matchesResponse, standings] =
+          await Promise.all([
+            api.get<PlayersResponse>("/players?page=1&limit=1"),
+            api.get<PlayersResponse>("/players?page=1&limit=1&free=true"),
+            api.get<Club[]>("/clubs"),
+            api.get<Match[]>("/matches"),
+            // A classificação só enfeita o selo: se falhar, o resto continua.
+            api.get<Standing[]>("/standings").catch(() => [] as Standing[]),
+          ]);
 
         if (!active) return;
 
@@ -189,62 +184,21 @@ export default function Home() {
             xmlns="http://www.w3.org/2000/svg"
           >
             {/* Linha central e círculo do meio */}
-            <line
-              x1="500"
-              y1="0"
-              x2="500"
-              y2="600"
-              vectorEffect="non-scaling-stroke"
-            />
-            <circle
-              cx="500"
-              cy="300"
-              r="95"
-              vectorEffect="non-scaling-stroke"
-            />
+            <line x1="500" y1="0" x2="500" y2="600" vectorEffect="non-scaling-stroke" />
+            <circle cx="500" cy="300" r="95" vectorEffect="non-scaling-stroke" />
             <circle cx="500" cy="300" r="2" fill="#d1d5db" stroke="none" />
 
             {/* Grande área esquerda */}
-            <rect
-              x="0"
-              y="150"
-              width="140"
-              height="300"
-              vectorEffect="non-scaling-stroke"
-            />
-            <rect
-              x="0"
-              y="228"
-              width="50"
-              height="144"
-              vectorEffect="non-scaling-stroke"
-            />
+            <rect x="0" y="150" width="140" height="300" vectorEffect="non-scaling-stroke" />
+            <rect x="0" y="228" width="50" height="144" vectorEffect="non-scaling-stroke" />
             <circle cx="100" cy="300" r="2" fill="#d1d5db" stroke="none" />
-            <path
-              d="M 140 250 A 70 70 0 0 1 140 350"
-              vectorEffect="non-scaling-stroke"
-            />
+            <path d="M 140 250 A 70 70 0 0 1 140 350" vectorEffect="non-scaling-stroke" />
 
             {/* Grande área direita */}
-            <rect
-              x="860"
-              y="150"
-              width="140"
-              height="300"
-              vectorEffect="non-scaling-stroke"
-            />
-            <rect
-              x="950"
-              y="228"
-              width="50"
-              height="144"
-              vectorEffect="non-scaling-stroke"
-            />
+            <rect x="860" y="150" width="140" height="300" vectorEffect="non-scaling-stroke" />
+            <rect x="950" y="228" width="50" height="144" vectorEffect="non-scaling-stroke" />
             <circle cx="900" cy="300" r="2" fill="#d1d5db" stroke="none" />
-            <path
-              d="M 860 250 A 70 70 0 0 0 860 350"
-              vectorEffect="non-scaling-stroke"
-            />
+            <path d="M 860 250 A 70 70 0 0 0 860 350" vectorEffect="non-scaling-stroke" />
           </svg>
         </div>
 
@@ -276,9 +230,7 @@ export default function Home() {
             {/* Badge Liga Fictícia */}
             <div className="mt-6 flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50/80 px-3.5 py-1 text-xs">
               <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-              <strong className="font-medium text-gray-900">
-                Liga Fictícia 2026
-              </strong>
+              <strong className="font-medium text-gray-900">Liga Fictícia 2026</strong>
               <span className="text-[#726871]">·</span>
               <span className="text-[#726871]">
                 {dashboardError
@@ -290,10 +242,8 @@ export default function Home() {
                           dashboard.leader.points === 1 ? "ponto" : "pontos"
                         }`
                       : `${dashboard.matches} ${
-                        dashboard.matches === 1
-                          ? "partida registrada"
-                          : "partidas registradas"
-                      }`}
+                          dashboard.matches === 1 ? "partida registrada" : "partidas registradas"
+                        }`}
               </span>
             </div>
 
@@ -304,9 +254,8 @@ export default function Home() {
 
             {/* Subtítulo */}
             <p className="mt-3 max-w-[630px] text-base leading-6 text-[#686872]">
-              Cadastre jogadores, monte os clubes e negocie com contrato de
-              fidelidade. Depois, escale os titulares e jogue partidas com
-              placar calculado pelos atributos.
+              Cadastre jogadores, monte os clubes e negocie com contrato de fidelidade. Depois,
+              escale os titulares e jogue partidas com placar calculado pelos atributos.
             </p>
 
             {/* Botão de Iniciar com atalho Enter */}
@@ -347,8 +296,7 @@ export default function Home() {
               <div className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5 text-gray-400" />
                 <span>
-                  <strong className="font-medium text-gray-800">{dashboard.clubs}</strong>{" "}
-                  clubes
+                  <strong className="font-medium text-gray-800">{dashboard.clubs}</strong> clubes
                 </span>
               </div>
               <span className="text-gray-300">·</span>
@@ -381,12 +329,8 @@ export default function Home() {
                   <span className="font-mono text-xs text-gray-400">{n}</span>
                 </div>
 
-                <h3 className="mt-5 text-base font-medium leading-6">
-                  {title}
-                </h3>
-                <p className="mt-1 text-xs leading-[18px] text-gray-500">
-                  {text}
-                </p>
+                <h3 className="mt-5 text-base font-medium leading-6">{title}</h3>
+                <p className="mt-1 text-xs leading-[18px] text-gray-500">{text}</p>
 
                 {i < modules.length - 1 && (
                   <ChevronRight className="absolute -right-[18px] top-1/2 hidden h-4 w-4 -translate-y-1/2 text-gray-400 lg:block" />

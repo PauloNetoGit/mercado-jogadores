@@ -13,14 +13,14 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
-import {
-  Modal,
-  ModalActions,
-  btnPrimary,
-  btnSecondary,
-} from "@/src/components/Modal";
+import { Modal, ModalActions, btnPrimary, btnSecondary } from "@/src/components/Modal";
 import { Avatar } from "@/src/components/players/Avatar";
-import { clubsService, TETO_MULTA, type JogadorDoClube, type ResultadoVenda } from "@/src/services/clubs";
+import {
+  clubsService,
+  TETO_MULTA,
+  type JogadorDoClube,
+  type ResultadoVenda,
+} from "@/src/services/clubs";
 import { POSICOES } from "@/src/services/players";
 import { formatMoney } from "@/src/utils/format";
 
@@ -34,7 +34,11 @@ const TZ = "America/Sao_Paulo";
 function formatBrasilia(iso: string) {
   const date = new Date(iso);
   const day = new Intl.DateTimeFormat("pt-BR", { timeZone: TZ }).format(date);
-  const time = new Intl.DateTimeFormat("pt-BR", { timeZone: TZ, hour: "2-digit", minute: "2-digit" }).format(date);
+  const time = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
   return `${day}, ${time}`;
 }
 
@@ -97,7 +101,9 @@ export function SellModal({
         setNetworkError(true);
       } else {
         const message = err instanceof Error ? err.message : "Não foi possível vender o jogador.";
-        setRefusal(/livre/i.test(message) ? `${player.name} já está livre e não pode ser vendido.` : message);
+        setRefusal(
+          /livre/i.test(message) ? `${player.name} já está livre e não pode ser vendido.` : message,
+        );
         onRefused();
       }
       setSubmitting(false);
@@ -114,7 +120,10 @@ export function SellModal({
     >
       <div className="space-y-4">
         {networkError && (
-          <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+          >
             <CircleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
             <div className="text-[13px] leading-5">
               <p className="font-medium text-red-800">Sem conexão</p>
@@ -124,7 +133,10 @@ export function SellModal({
         )}
 
         {refusal && (
-          <div role="alert" className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+          <div
+            role="alert"
+            className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700"
+          >
             <CircleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
             <div className="text-[13px] leading-5">
               <p className="font-medium text-red-800">A venda foi recusada</p>
@@ -134,13 +146,16 @@ export function SellModal({
         )}
 
         {starter && !refusal && (
-          <div role="status" className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800">
+          <div
+            role="status"
+            className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800"
+          >
             <TriangleAlert size={16} strokeWidth={1.8} className="mt-0.5 shrink-0" />
             <div className="text-[13px] leading-5">
               <p className="font-medium text-amber-900">{player.name} é titular</p>
               <p>
-                Ao vender, ele sai da escalação, e o {clubName} só volta a jogar partidas depois de escalar de novo os 5
-                titulares.
+                Ao vender, ele sai da escalação, e o {clubName} só volta a jogar partidas depois de
+                escalar de novo os 5 titulares.
               </p>
             </div>
           </div>
@@ -159,7 +174,9 @@ export function SellModal({
           </div>
           <div className="shrink-0 text-right">
             <p className="text-[11px] text-neutral-500">Valor de mercado</p>
-            <p className="text-[16px] font-semibold tabular-nums">{formatMoney(player.market_value)}</p>
+            <p className="text-[16px] font-semibold tabular-nums">
+              {formatMoney(player.market_value)}
+            </p>
           </div>
         </div>
 
@@ -167,11 +184,15 @@ export function SellModal({
         <dl className="overflow-hidden rounded-xl border border-neutral-200 text-[13px]">
           <div className="flex items-center justify-between gap-4 px-4 py-2.5">
             <dt className="text-neutral-600">Valor de compra</dt>
-            <dd className="font-medium tabular-nums">{contract ? formatMoney(contract.purchase_value) : "—"}</dd>
+            <dd className="font-medium tabular-nums">
+              {contract ? formatMoney(contract.purchase_value) : "—"}
+            </dd>
           </div>
           <div className="flex items-center justify-between gap-4 border-t border-neutral-200 px-4 py-2.5">
             <dt className="text-neutral-600">Fim da fidelidade</dt>
-            <dd className="font-medium tabular-nums">{contract ? formatBrasilia(contract.loyalty_until) : "—"}</dd>
+            <dd className="font-medium tabular-nums">
+              {contract ? formatBrasilia(contract.loyalty_until) : "—"}
+            </dd>
           </div>
           <div className="flex items-center justify-between gap-4 border-t border-neutral-200 px-4 py-2.5">
             <dt className="text-neutral-600">Dias restantes</dt>
@@ -193,9 +214,9 @@ export function SellModal({
         </dl>
 
         <p className="flex items-start gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-[11px] leading-4 text-neutral-600">
-          <Info size={14} strokeWidth={1.7} className="mt-px shrink-0" />
-          A venda é pelo valor de mercado do momento. Multa (teto de {formatMoney(TETO_MULTA)}), lucro, comissão e
-          crédito são calculados ao confirmar.
+          <Info size={14} strokeWidth={1.7} className="mt-px shrink-0" />A venda é pelo valor de
+          mercado do momento. Multa (teto de {formatMoney(TETO_MULTA)}), lucro, comissão e crédito
+          são calculados ao confirmar.
         </p>
 
         {submitting && (
@@ -356,7 +377,10 @@ export function SaleDoneModal({
             hint="Valor de mercado no momento da venda"
             value={formatMoney(data.saleValue)}
           />
-          <Line label="Dias restantes" value={new Intl.NumberFormat("pt-BR").format(data.remainingDays)} />
+          <Line
+            label="Dias restantes"
+            value={new Intl.NumberFormat("pt-BR").format(data.remainingDays)}
+          />
           <Line
             label="Multa"
             hint={
@@ -369,7 +393,11 @@ export function SaleDoneModal({
           <Line label="Lucro" value={signed(data.profit)} valueClass={profitClass} />
           <Line
             label="Comissão"
-            hint={data.profit > 0 ? "10% do lucro até 10,00 + 20% do que passar" : "Sem lucro: sem comissão"}
+            hint={
+              data.profit > 0
+                ? "10% do lucro até 10,00 + 20% do que passar"
+                : "Sem lucro: sem comissão"
+            }
             value={formatMoney(data.commission)}
           />
           <Line
@@ -388,7 +416,9 @@ export function SaleDoneModal({
                     : "border-neutral-200 bg-neutral-50 text-neutral-700"
                 }`}
               >
-                <span aria-hidden className="text-[8px]">●</span>
+                <span aria-hidden className="text-[8px]">
+                  ●
+                </span>
                 {data.contractStatus}
               </span>
             </dd>
@@ -448,7 +478,11 @@ function Line({
         <dt className={strong ? "font-semibold" : "text-neutral-600"}>{label}</dt>
         {hint && <p className="text-[11px] text-neutral-500">{hint}</p>}
       </div>
-      <dd className={`tabular-nums ${strong ? "text-[16px] font-semibold" : "font-medium"} ${valueClass}`}>{value}</dd>
+      <dd
+        className={`tabular-nums ${strong ? "text-[16px] font-semibold" : "font-medium"} ${valueClass}`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }

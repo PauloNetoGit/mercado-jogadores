@@ -71,10 +71,7 @@ export const POSICOES: Record<Posicao, string> = {
   ATA: "Atacante",
 };
 
-export const CONDICOES: Record<
-  Condicao,
-  { label: string; color: string; bg: string }
-> = {
+export const CONDICOES: Record<Condicao, { label: string; color: string; bg: string }> = {
   APTO: { label: "Apto", color: "#087A37", bg: "#E8FFF0" },
   MAL_CONDICIONADO: { label: "Mal condicionado", color: "#9A5700", bg: "#FFF6D9" },
   DOENTE: { label: "Doente", color: "#D21F35", bg: "#FFF0F1" },
@@ -101,8 +98,7 @@ export const playersService = {
 
   create: (body: DadosJogador) => api.post<Jogador>("/players", body),
 
-  update: (id: number, body: DadosJogador) =>
-    api.put<Jogador>(`/players/${id}`, body),
+  update: (id: number, body: DadosJogador) => api.put<Jogador>(`/players/${id}`, body),
 
   setCondition: (id: number, condition: Condicao) =>
     api.patch<{ id: number; condition: Condicao }>(`/players/${id}/condition`, {

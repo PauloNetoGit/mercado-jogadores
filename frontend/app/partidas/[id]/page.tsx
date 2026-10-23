@@ -142,8 +142,8 @@ function PartidaDetalheView({ id }: { id: number }) {
                 <div>
                   <h2 className="text-[16px] font-semibold">Em campo</h2>
                   <p className="mt-0.5 text-[12px] text-neutral-500">
-                    Titulares de cada clube na formação da partida e os valores usados nos duelos, já com o efeito
-                    da condição.
+                    Titulares de cada clube na formação da partida e os valores usados nos duelos,
+                    já com o efeito da condição.
                   </p>
                 </div>
                 <FieldLegend />
@@ -155,18 +155,18 @@ function PartidaDetalheView({ id }: { id: number }) {
               <div className="px-5 pb-4 pt-4">
                 <h2 className="text-[16px] font-semibold">Duelos</h2>
                 <p className="mt-0.5 text-[12px] leading-5 text-neutral-500">
-                  Os 3 ataques do mandante e depois os 3 do visitante. Os jogadores de linha vão do 1º (o mais
-                  recuado) ao 4º (o mais avançado), pela ordem do elenco: o 4º ataca o goleiro, o 3º ataca o 1º e o
-                  2º ataca o 2º.
+                  Os 3 ataques do mandante e depois os 3 do visitante. Os jogadores de linha vão do
+                  1º (o mais recuado) ao 4º (o mais avançado), pela ordem do elenco: o 4º ataca o
+                  goleiro, o 3º ataca o 1º e o 2º ataca o 2º.
                 </p>
               </div>
               <DuelsTable match={match} acronyms={acronyms} />
             </section>
 
             <p className="text-[12px] leading-5 text-neutral-500">
-              Mesma tela logo depois de jogar e ao abrir uma partida do histórico, com as formações dos dois clubes
-              e os 6 duelos. Os valores e a condição de cada titular vêm gravados nos duelos devolvidos pela API: mal
-              condicionado joga com 15% a menos.
+              Mesma tela logo depois de jogar e ao abrir uma partida do histórico, com as formações
+              dos dois clubes e os 6 duelos. Os valores e a condição de cada titular vêm gravados
+              nos duelos devolvidos pela API: mal condicionado joga com 15% a menos.
             </p>
           </div>
         )}

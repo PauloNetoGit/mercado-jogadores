@@ -28,13 +28,13 @@ describe('RN01 data e hora de Brasília', () => {
 
 describe('V8 id na URL', () => {
   it.each(['1', '42', '2147483647'])('aceita %s', (raw) => {
-    expect(parsePathId(raw, 'Jogador')).toBe(Number(raw));
+    expect(parsePathId(raw, 'Jogador não encontrado.')).toBe(Number(raw));
   });
 
   it.each(['abc', '0', '-1', '1.5', '01', '2147483648'])(
     'trata %s como inexistente',
     (raw) => {
-      expect(() => parsePathId(raw, 'Jogador')).toThrow(
+      expect(() => parsePathId(raw, 'Jogador não encontrado.')).toThrow(
         'Jogador não encontrado.',
       );
     },

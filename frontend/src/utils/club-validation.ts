@@ -28,10 +28,7 @@ function lettersOnly(value: string): string {
     .toUpperCase();
 }
 
-export function validateClubForm(
-  rawName: string,
-  rawAcronym: string,
-): ClubValidationError | null {
+export function validateClubForm(rawName: string, rawAcronym: string): ClubValidationError | null {
   const name = normalizeName(rawName);
   const words = name.split(" ");
 
@@ -77,8 +74,7 @@ export function validateClubForm(
     if (index < 0) {
       return {
         field: "acronym",
-        message:
-          "As letras da sigla devem aparecer no nome, nessa mesma ordem.",
+        message: "As letras da sigla devem aparecer no nome, nessa mesma ordem.",
       };
     }
     cursor = index + 1;

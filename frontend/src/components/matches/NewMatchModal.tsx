@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, CircleAlert, Info, Loader2, RefreshCw, Shield, Swords } from "lucide-react";
-import {
-  Modal,
-  ModalActions,
-  btnPrimary,
-  btnSecondary,
-  inputClass,
-} from "@/src/components/Modal";
+import { Modal, ModalActions, btnPrimary, btnSecondary, inputClass } from "@/src/components/Modal";
 import { clubsService } from "@/src/services/clubs";
 import { matchesService, type PartidaDetalhe } from "@/src/services/matches";
 import type { Clube } from "@/src/types";
@@ -58,7 +52,8 @@ export function NewMatchModal({
   /** A API devolveu a partida jogada, já com o placar e os 6 duelos. */
   onPlayed: (match: PartidaDetalhe) => void;
 }) {
-  const exists = (id?: number) => (id !== undefined && clubs.some((club) => club.id === id) ? id : undefined);
+  const exists = (id?: number) =>
+    id !== undefined && clubs.some((club) => club.id === id) ? id : undefined;
   const initialHome = exists(defaultHomeId) ?? clubs[0]?.id;
   const initialAway =
     exists(defaultAwayId) !== undefined && exists(defaultAwayId) !== initialHome
@@ -183,10 +178,11 @@ export function NewMatchModal({
             Como sai o placar
           </p>
           <p className="mt-2 text-[12px] leading-[18px] text-neutral-600">
-            Cada time faz 3 ataques. Pela ordem do elenco, os jogadores de linha vão do 1º (o mais recuado) ao 4º
-            (o mais avançado): o 4º enfrenta o goleiro, o 3º enfrenta o 1º e o 2º enfrenta o 2º do adversário. O
-            atacante usa finalização (ATA), passe (MEI) ou drible (ZAG e LAT), e quem defende usa defesa. É gol só
-            quando o ataque é maior; mal condicionado joga com 15% a menos.
+            Cada time faz 3 ataques. Pela ordem do elenco, os jogadores de linha vão do 1º (o mais
+            recuado) ao 4º (o mais avançado): o 4º enfrenta o goleiro, o 3º enfrenta o 1º e o 2º
+            enfrenta o 2º do adversário. O atacante usa finalização (ATA), passe (MEI) ou drible
+            (ZAG e LAT), e quem defende usa defesa. É gol só quando o ataque é maior; mal
+            condicionado joga com 15% a menos.
           </p>
           <p className="mt-2 text-[12px] leading-[18px] text-neutral-600">
             Os dois clubes precisam ter os 5 titulares escalados. A partida não mexe no caixa.

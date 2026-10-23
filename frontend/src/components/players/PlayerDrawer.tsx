@@ -54,7 +54,8 @@ export function PlayerDrawer({
   useEffect(() => {
     const frame = requestAnimationFrame(() => setShown(true));
     function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape" && !document.querySelector('[aria-modal="true"]')) closeRef.current();
+      if (event.key === "Escape" && !document.querySelector('[aria-modal="true"]'))
+        closeRef.current();
     }
     document.addEventListener("keydown", onKeyDown);
     return () => {
@@ -73,7 +74,7 @@ export function PlayerDrawer({
         tabIndex={-1}
         onClick={onClose}
         className={`absolute inset-0 bg-black/60 transition-opacity duration-200 ${shown ? "opacity-100" : "opacity-0"}`}
-        />
+      />
 
       <aside
         role="dialog"
@@ -85,9 +86,7 @@ export function PlayerDrawer({
         <header className="flex items-start gap-3 border-b border-neutral-200 px-5 py-4">
           <Avatar id={player.id} name={player.name} size={40} />
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-[16px] font-semibold">
-              {player.name}
-            </h2>
+            <h2 className="truncate text-[16px] font-semibold">{player.name}</h2>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
               <span className="rounded-md border border-neutral-200 px-2 py-0.5 text-[11px] font-medium">
                 {player.position}
@@ -138,19 +137,13 @@ export function PlayerDrawer({
 
           <section>
             <div className="flex items-baseline justify-between">
-              <h3 className="text-[14px] font-semibold">
-                Indicadores técnicos
-              </h3>
-              <span className="text-[11px] text-neutral-500">
-                Escala de 1 a 99
-              </span>
+              <h3 className="text-[14px] font-semibold">Indicadores técnicos</h3>
+              <span className="text-[11px] text-neutral-500">Escala de 1 a 99</span>
             </div>
             <ul className="mt-3 space-y-2.5">
               {ATTRIBUTES.map(({ key, label }) => (
                 <li key={key} className="flex items-center gap-3 text-[13px]">
-                  <span className="w-[76px] shrink-0 text-neutral-600">
-                    {label}
-                  </span>
+                  <span className="w-[76px] shrink-0 text-neutral-600">{label}</span>
                   <span className="relative h-2 flex-1 overflow-hidden rounded-full bg-neutral-100">
                     <span
                       className="absolute inset-y-0 left-0 rounded-full bg-[#155DFC]/20"
@@ -161,20 +154,17 @@ export function PlayerDrawer({
                       style={{ width: `${player[key]}%` }}
                     />
                   </span>
-                  <span className="w-6 text-right font-medium tabular-nums">
-                    {player[key]}
-                  </span>
+                  <span className="w-6 text-right font-medium tabular-nums">{player[key]}</span>
                 </li>
               ))}
             </ul>
             <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-neutral-500">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-sm bg-[#155DFC]" /> Valor do
-                atributo
+                <span className="h-2 w-2 rounded-sm bg-[#155DFC]" /> Valor do atributo
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-sm bg-[#155DFC]/20" /> Até o
-                potencial ({player.potential}), que nenhum atributo passa
+                <span className="h-2 w-2 rounded-sm bg-[#155DFC]/20" /> Até o potencial (
+                {player.potential}), que nenhum atributo passa
               </span>
             </p>
           </section>
@@ -218,11 +208,7 @@ export function PlayerDrawer({
             </button>
           </div>
           {free && (
-            <button
-              type="button"
-              onClick={onBuy}
-              className={`${btnPrimary} whitespace-nowrap`}
-            >
+            <button type="button" onClick={onBuy} className={`${btnPrimary} whitespace-nowrap`}>
               <ShoppingCart size={13} strokeWidth={1.8} /> Comprar
             </button>
           )}
@@ -233,7 +219,17 @@ export function PlayerDrawer({
   );
 }
 
-function Stat({ icon: Icon, label, value, caption }: { icon: LucideIcon; label: string; value: string; caption: string }) {
+function Stat({
+  icon: Icon,
+  label,
+  value,
+  caption,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  caption: string;
+}) {
   return (
     <div className="rounded-xl border border-neutral-200 p-3">
       <div className="flex items-center justify-between text-[12px] text-neutral-500">

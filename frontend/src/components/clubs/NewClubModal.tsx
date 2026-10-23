@@ -110,8 +110,7 @@ export function NewClubModal({ clubs, onClose, onCreated }: NewClubModalProps) {
       const created = await clubsService.create({ name: cleanName, acronym });
       onCreated(created);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Erro ao processar requisição";
+      const message = err instanceof Error ? err.message : "Erro ao processar requisição";
       fail(mapServerError(message, cleanName, acronym));
       setSubmitting(false);
     }
@@ -139,10 +138,7 @@ export function NewClubModal({ clubs, onClose, onCreated }: NewClubModalProps) {
             <h2 id="novo-clube-titulo" className="text-[15px] font-semibold">
               Novo clube
             </h2>
-            <p
-              id="novo-clube-descricao"
-              className="mt-1 text-[13px] text-neutral-500"
-            >
+            <p id="novo-clube-descricao" className="mt-1 text-[13px] text-neutral-500">
               Informe o nome e a sigla do clube.
             </p>
           </div>
@@ -201,12 +197,9 @@ export function NewClubModal({ clubs, onClose, onCreated }: NewClubModalProps) {
                 }`}
               />
             </div>
-            <p
-              id="club-name-help"
-              className="mt-1.5 text-[11px] leading-4 text-neutral-500"
-            >
-              De 3 a 60 caracteres e de 2 a 5 palavras; só letras, espaços,
-              hífen e ponto. Não pode repetir outro clube.
+            <p id="club-name-help" className="mt-1.5 text-[11px] leading-4 text-neutral-500">
+              De 3 a 60 caracteres e de 2 a 5 palavras; só letras, espaços, hífen e ponto. Não pode
+              repetir outro clube.
             </p>
           </div>
 
@@ -221,7 +214,10 @@ export function NewClubModal({ clubs, onClose, onCreated }: NewClubModalProps) {
               onChange={(event) => {
                 // Só A–Z, sempre maiúsculas, no máximo 3 letras.
                 setAcronym(
-                  event.target.value.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3),
+                  event.target.value
+                    .toUpperCase()
+                    .replace(/[^A-Z]/g, "")
+                    .slice(0, 3),
                 );
                 if (acronymInvalid) setError(null);
               }}
@@ -236,19 +232,15 @@ export function NewClubModal({ clubs, onClose, onCreated }: NewClubModalProps) {
                   : "border-neutral-300 focus:border-[#155DFC] focus:ring-2 focus:ring-[#155DFC]/15"
               }`}
             />
-            <p
-              id="club-acronym-help"
-              className="mt-1.5 text-[11px] leading-4 text-neutral-500"
-            >
-              3 letras de A a Z, maiúsculas, que aparecem no nome nessa ordem; a
-              primeira é a primeira letra do nome.
+            <p id="club-acronym-help" className="mt-1.5 text-[11px] leading-4 text-neutral-500">
+              3 letras de A a Z, maiúsculas, que aparecem no nome nessa ordem; a primeira é a
+              primeira letra do nome.
             </p>
           </div>
 
           <div className="mt-4 flex items-center gap-2.5 rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-[13px] text-neutral-600">
-            <Wallet size={14} strokeWidth={1.7} className="shrink-0" />
-            O clube começa com {formatMoney(CAIXA_INICIAL)} em caixa e sem
-            jogadores.
+            <Wallet size={14} strokeWidth={1.7} className="shrink-0" />O clube começa com{" "}
+            {formatMoney(CAIXA_INICIAL)} em caixa e sem jogadores.
           </div>
 
           <div className="mt-4 flex justify-end gap-2 border-t border-neutral-200 pt-4">

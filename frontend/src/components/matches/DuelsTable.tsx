@@ -17,12 +17,21 @@ export function DuelsTable({
   match: PartidaDetalhe;
   acronyms: Map<number, string>;
 }) {
-  const clubName = (id: number) => (id === match.home.club_id ? match.home.club_name : match.away.club_name);
+  const clubName = (id: number) =>
+    id === match.home.club_id ? match.home.club_name : match.away.club_name;
   const acronym = (id: number) => acronyms.get(id) ?? clubName(id).slice(0, 3).toUpperCase();
 
   const groups = [
-    { club: match.home, role: "mandante", duels: match.duels.filter((duel) => duel.attacking_club_id === match.home.club_id) },
-    { club: match.away, role: "visitante", duels: match.duels.filter((duel) => duel.attacking_club_id === match.away.club_id) },
+    {
+      club: match.home,
+      role: "mandante",
+      duels: match.duels.filter((duel) => duel.attacking_club_id === match.home.club_id),
+    },
+    {
+      club: match.away,
+      role: "visitante",
+      duels: match.duels.filter((duel) => duel.attacking_club_id === match.away.club_id),
+    },
   ];
 
   return (
@@ -50,7 +59,9 @@ export function DuelsTable({
                 duels={group.duels}
                 clubName={clubName}
                 defendingClubId={(duel) =>
-                  duel.attacking_club_id === match.home.club_id ? match.away.club_id : match.home.club_id
+                  duel.attacking_club_id === match.home.club_id
+                    ? match.away.club_id
+                    : match.home.club_id
                 }
               />
             );
@@ -110,7 +121,8 @@ function GroupRows({
                 <div>
                   <p className="text-[14px] font-semibold">{duel.attacker.player_name}</p>
                   <p className="text-[12px] text-neutral-500">
-                    {lineLabel(duel.attacker.position, attackerLine)} · {clubName(duel.attacking_club_id)}
+                    {lineLabel(duel.attacker.position, attackerLine)} ·{" "}
+                    {clubName(duel.attacking_club_id)}
                   </p>
                 </div>
               </div>

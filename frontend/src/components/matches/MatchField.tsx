@@ -83,7 +83,8 @@ function collectPlayers(match: PartidaDetalhe) {
 
   for (const duel of match.duels) {
     const attackingId = duel.attacking_club_id;
-    const defendingId = attackingId === match.home.club_id ? match.away.club_id : match.home.club_id;
+    const defendingId =
+      attackingId === match.home.club_id ? match.away.club_id : match.home.club_id;
     entry(attackingId, duel.attacker).attack = {
       attribute: duel.attacker.attribute,
       value: duel.attacker.value,
@@ -116,7 +117,8 @@ function place(players: FieldPlayer[], formation: string, mirror: boolean): Plac
 
   const sizes = formation.split("-").map(Number);
   const lines =
-    sizes.every((size) => Number.isInteger(size) && size > 0) && sizes.reduce((a, b) => a + b, 0) === field.length
+    sizes.every((size) => Number.isInteger(size) && size > 0) &&
+    sizes.reduce((a, b) => a + b, 0) === field.length
       ? sizes
       : [field.length];
 
@@ -144,7 +146,8 @@ function place(players: FieldPlayer[], formation: string, mirror: boolean): Plac
 
 function subtitle(player: FieldPlayer) {
   const parts: string[] = [player.position];
-  if (player.attack) parts.push(`${ATTRIBUTE_SHORT[player.attack.attribute]} ${player.attack.value}`);
+  if (player.attack)
+    parts.push(`${ATTRIBUTE_SHORT[player.attack.attribute]} ${player.attack.value}`);
   if (player.defense !== undefined) parts.push(`Def ${player.defense}`);
   return parts.join(" · ");
 }
@@ -159,20 +162,39 @@ export function MatchField({ match }: { match: PartidaDetalhe }) {
       <div
         className="relative aspect-[2.43/1] min-w-[820px] overflow-hidden rounded-2xl"
         style={{
-          background: "repeating-linear-gradient(90deg, #0d5a2c 0 7.1429%, #10652f 7.1429% 14.2858%)",
+          background:
+            "repeating-linear-gradient(90deg, #0d5a2c 0 7.1429%, #10652f 7.1429% 14.2858%)",
         }}
       >
         {/* Marcações do campo */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-[2.2%] inset-y-[5%] border border-white/35" />
-        <div aria-hidden className="pointer-events-none absolute inset-y-[5%] left-1/2 border-l border-white/35" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-[2.2%] inset-y-[5%] border border-white/35"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-[5%] left-1/2 border-l border-white/35"
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute left-1/2 top-1/2 aspect-square h-[24%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/35"
         />
-        <div aria-hidden className="pointer-events-none absolute left-[2.2%] top-[23.5%] h-[53%] w-[9%] border border-l-0 border-white/35" />
-        <div aria-hidden className="pointer-events-none absolute left-[2.2%] top-[37.5%] h-[25%] w-[3.2%] border border-l-0 border-white/35" />
-        <div aria-hidden className="pointer-events-none absolute right-[2.2%] top-[23.5%] h-[53%] w-[9%] border border-r-0 border-white/35" />
-        <div aria-hidden className="pointer-events-none absolute right-[2.2%] top-[37.5%] h-[25%] w-[3.2%] border border-r-0 border-white/35" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-[2.2%] top-[23.5%] h-[53%] w-[9%] border border-l-0 border-white/35"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-[2.2%] top-[37.5%] h-[25%] w-[3.2%] border border-l-0 border-white/35"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-[2.2%] top-[23.5%] h-[53%] w-[9%] border border-r-0 border-white/35"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute right-[2.2%] top-[37.5%] h-[25%] w-[3.2%] border border-r-0 border-white/35"
+        />
 
         {/* Identificação dos times */}
         <TeamChip name={match.home.club_name} formation={match.home.formation} side="home" />
@@ -189,7 +211,15 @@ export function MatchField({ match }: { match: PartidaDetalhe }) {
   );
 }
 
-function TeamChip({ name, formation, side }: { name: string; formation: string; side: "home" | "away" }) {
+function TeamChip({
+  name,
+  formation,
+  side,
+}: {
+  name: string;
+  formation: string;
+  side: "home" | "away";
+}) {
   const home = side === "home";
   return (
     <div

@@ -62,8 +62,7 @@ export interface LinhaClassificacao {
 
 export const matchesService = {
   /** Da mais recente para a mais antiga; `clubId` traz só as partidas desse clube. */
-  list: (clubId?: number) =>
-    api.get<Partida[]>(clubId ? `/matches?club_id=${clubId}` : "/matches"),
+  list: (clubId?: number) => api.get<Partida[]>(clubId ? `/matches?club_id=${clubId}` : "/matches"),
 
   get: (id: number | string) => api.get<PartidaDetalhe>(`/matches/${id}`),
 

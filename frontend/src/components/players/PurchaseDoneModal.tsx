@@ -88,7 +88,9 @@ export function PurchaseDoneModal({
             <div>
               <dt className="text-neutral-600">Taxa</dt>
               <p className="text-[11px] text-neutral-500">
-                {data.fee > 0 ? "5% do valor, porque passa de 30,00" : "Sem taxa: o valor não passa de 30,00"}
+                {data.fee > 0
+                  ? "5% do valor, porque passa de 30,00"
+                  : "Sem taxa: o valor não passa de 30,00"}
               </p>
             </div>
             <dd className="font-medium tabular-nums">{formatMoney(data.fee)}</dd>
@@ -117,7 +119,9 @@ export function PurchaseDoneModal({
                     : "border-neutral-200 bg-neutral-50 text-neutral-700"
                 }`}
               >
-                <span aria-hidden className="text-[8px]">●</span>
+                <span aria-hidden className="text-[8px]">
+                  ●
+                </span>
                 {data.contractStatus}
               </span>
             </dd>

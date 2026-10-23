@@ -101,7 +101,9 @@ export class MarketService {
         where: { clube_id: club.id, excluido_em: null },
       });
       if (squadSize >= MAX_SQUAD_SIZE)
-        throw new ConflictException(`O elenco do ${club.nome} já tem 12 jogadores, o limite da liga.`);
+        throw new ConflictException(
+          `O elenco do ${club.nome} já tem 12 jogadores, o limite da liga.`,
+        );
 
       const valueCents = toCents(marketValueOf(player));
       const feeCents = purchaseFeeCents(valueCents);

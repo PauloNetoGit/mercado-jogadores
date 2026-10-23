@@ -73,14 +73,18 @@ export function PlayerCreatedModal({
               <dt className="text-[13px] font-semibold">Valor base</dt>
               <p className="text-[12px] text-neutral-500">Calculado no cadastro; não muda depois</p>
             </div>
-            <dd className="text-[18px] font-semibold tabular-nums">{formatMoney(player.baseValue)}</dd>
+            <dd className="text-[18px] font-semibold tabular-nums">
+              {formatMoney(player.baseValue)}
+            </dd>
           </div>
           <div className="flex items-center justify-between border-t border-neutral-200 px-4 py-3">
             <div>
               <dt className="text-[13px] text-neutral-600">Valor de mercado</dt>
               <p className="text-[12px] text-neutral-500">Com condição, agilidade e idade</p>
             </div>
-            <dd className="text-[14px] font-medium tabular-nums">{formatMoney(player.marketValue)}</dd>
+            <dd className="text-[14px] font-medium tabular-nums">
+              {formatMoney(player.marketValue)}
+            </dd>
           </div>
           <div className="flex items-center justify-between border-t border-neutral-200 px-4 py-3">
             <div>

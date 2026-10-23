@@ -101,8 +101,7 @@ export function MatchHero({
   showFormations?: boolean;
   action?: ReactNode;
 }) {
-  const acronym = (id: number, name: string) =>
-    acronyms.get(id) ?? name.slice(0, 3).toUpperCase();
+  const acronym = (id: number, name: string) => acronyms.get(id) ?? name.slice(0, 3).toUpperCase();
 
   return (
     <div className="relative flex flex-wrap items-center justify-center gap-x-5 gap-y-4 rounded-xl border border-neutral-200 bg-white px-6 py-6 shadow-sm">
@@ -134,7 +133,9 @@ export function MatchHero({
         </div>
       </div>
 
-      {action && <div className="lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2">{action}</div>}
+      {action && (
+        <div className="lg:absolute lg:right-6 lg:top-1/2 lg:-translate-y-1/2">{action}</div>
+      )}
     </div>
   );
 }

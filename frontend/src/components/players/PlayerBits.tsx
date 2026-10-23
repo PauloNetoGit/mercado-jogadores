@@ -9,7 +9,9 @@ export function ConditionBadge({ condition }: { condition: Condicao }) {
       className="inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium"
       style={{ color: status.color, background: status.bg, border: `1px solid ${status.color}25` }}
     >
-      <span aria-hidden className="text-[8px]">●</span>
+      <span aria-hidden className="text-[8px]">
+        ●
+      </span>
       {status.label}
     </span>
   );

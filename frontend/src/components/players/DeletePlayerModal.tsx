@@ -41,11 +41,18 @@ export function DeletePlayerModal({
     >
       <PlayerSummary
         player={player}
-        badge={<span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[11px] font-medium">Livre</span>}
+        badge={
+          <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[11px] font-medium">
+            Livre
+          </span>
+        }
       />
 
       {error && (
-        <p role="alert" className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700">
+        <p
+          role="alert"
+          className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700"
+        >
           <CircleAlert size={14} className="mt-0.5 shrink-0" />
           {error}
         </p>
@@ -62,7 +69,11 @@ export function DeletePlayerModal({
           disabled={submitting}
           className="flex h-9 items-center gap-2 rounded-lg bg-red-600 px-4 text-[13px] font-medium text-white shadow-sm transition hover:brightness-95 disabled:opacity-60"
         >
-          {submitting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} strokeWidth={1.8} />}
+          {submitting ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Trash2 size={14} strokeWidth={1.8} />
+          )}
           Excluir jogador
         </button>
       </ModalActions>

@@ -12,7 +12,13 @@ import {
   formatMatchDateTime,
   scoreLine,
 } from "@/src/components/matches/MatchesShared";
-import { ErrorCard, LoadingCard, StateCard, describeLoadError, stateButtonClass } from "@/src/components/ListStates";
+import {
+  ErrorCard,
+  LoadingCard,
+  StateCard,
+  describeLoadError,
+  stateButtonClass,
+} from "@/src/components/ListStates";
 import { NewMatchModal } from "@/src/components/matches/NewMatchModal";
 import { FLASH_KEY } from "@/src/services/clubs";
 import {
@@ -24,7 +30,12 @@ import {
 
 const MINUS = "−";
 
-const CRITERIA = ["Mais pontos", "Maior saldo de gols", "Mais gols marcados", "Nome do clube, de A a Z"];
+const CRITERIA = [
+  "Mais pontos",
+  "Maior saldo de gols",
+  "Mais gols marcados",
+  "Nome do clube, de A a Z",
+];
 
 /** Saldo com sinal: +2 / −2 / 0. */
 function signed(value: number) {
@@ -132,7 +143,12 @@ export default function ClassificacaoPage() {
 
         {error && !rows ? (
           <div className="mt-6">
-            <ErrorCard what="a classificação" message={error} onRetry={refresh} retrying={loading} />
+            <ErrorCard
+              what="a classificação"
+              message={error}
+              onRetry={refresh}
+              retrying={loading}
+            />
           </div>
         ) : !rows ? (
           <div className="mt-6">
@@ -171,48 +187,48 @@ export default function ClassificacaoPage() {
                     </thead>
                     <tbody>
                       {rows.map((row) => (
-                            <tr
-                              key={row.club_id}
-                              className={`border-b border-neutral-200 ${loading ? "opacity-60" : ""}`}
+                        <tr
+                          key={row.club_id}
+                          className={`border-b border-neutral-200 ${loading ? "opacity-60" : ""}`}
+                        >
+                          <td className="px-4 py-4 text-center">
+                            <span
+                              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-semibold ${
+                                row.position === 1
+                                  ? "bg-[#155DFC] text-white"
+                                  : "bg-neutral-100 text-neutral-800"
+                              }`}
                             >
-                              <td className="px-4 py-4 text-center">
-                                <span
-                                  className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md px-1.5 text-[12px] font-semibold ${
-                                    row.position === 1
-                                      ? "bg-[#155DFC] text-white"
-                                      : "bg-neutral-100 text-neutral-800"
-                                  }`}
-                                >
-                                  {row.position}
-                                </span>
-                              </td>
-                              <td className="px-3 py-4">
-                                <div className="flex items-center gap-2.5">
-                                  <AcronymTag>{acronyms.get(row.club_id) ?? "—"}</AcronymTag>
-                                  <Link
-                                    href={`/clubes/${row.club_id}`}
-                                    className="font-medium underline underline-offset-2 hover:text-[#155DFC]"
-                                  >
-                                    {row.club_name}
-                                  </Link>
-                                </div>
-                              </td>
-                              <Stat value={row.played} />
-                              <Stat value={row.wins} />
-                              <Stat value={row.draws} />
-                              <Stat value={row.losses} />
-                              <Stat value={row.goals_for} />
-                              <Stat value={row.goals_against} />
-                              <Stat value={row.goal_difference} text={signed(row.goal_difference)} />
-                              <Stat value={row.points} bold />
-                            </tr>
-                          ))}
+                              {row.position}
+                            </span>
+                          </td>
+                          <td className="px-3 py-4">
+                            <div className="flex items-center gap-2.5">
+                              <AcronymTag>{acronyms.get(row.club_id) ?? "—"}</AcronymTag>
+                              <Link
+                                href={`/clubes/${row.club_id}`}
+                                className="font-medium underline underline-offset-2 hover:text-[#155DFC]"
+                              >
+                                {row.club_name}
+                              </Link>
+                            </div>
+                          </td>
+                          <Stat value={row.played} />
+                          <Stat value={row.wins} />
+                          <Stat value={row.draws} />
+                          <Stat value={row.losses} />
+                          <Stat value={row.goals_for} />
+                          <Stat value={row.goals_against} />
+                          <Stat value={row.goal_difference} text={signed(row.goal_difference)} />
+                          <Stat value={row.points} bold />
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>
                 <p className="px-5 py-3.5 text-[12px] text-neutral-500">
-                  J: jogos · V: vitórias · E: empates · D: derrotas · GP: gols marcados · GC: gols sofridos · SG:
-                  saldo de gols · Pts: pontos
+                  J: jogos · V: vitórias · E: empates · D: derrotas · GP: gols marcados · GC: gols
+                  sofridos · SG: saldo de gols · Pts: pontos
                 </p>
               </section>
 
@@ -221,7 +237,9 @@ export default function ClassificacaoPage() {
                 <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
                   <div className="border-b border-neutral-200 px-5 py-4">
                     <h2 className="text-[16px] font-semibold">Últimas partidas</h2>
-                    <p className="mt-0.5 text-[12px] text-neutral-500">Da mais recente para a mais antiga.</p>
+                    <p className="mt-0.5 text-[12px] text-neutral-500">
+                      Da mais recente para a mais antiga.
+                    </p>
                   </div>
                   <div className="px-5 py-4">
                     {recent.length === 0 ? (
@@ -235,11 +253,15 @@ export default function ClassificacaoPage() {
                                 {formatMatchDateTime(match.played_at)}
                               </p>
                               <p className="mt-1 flex flex-wrap items-center gap-2 text-[14px] group-hover:text-[#155DFC]">
-                                <span className={match.result === "MANDANTE" ? "font-semibold" : ""}>
+                                <span
+                                  className={match.result === "MANDANTE" ? "font-semibold" : ""}
+                                >
                                   {match.home.club_name}
                                 </span>
                                 <ScorePill home={match.home.goals} away={match.away.goals} />
-                                <span className={match.result === "VISITANTE" ? "font-semibold" : ""}>
+                                <span
+                                  className={match.result === "VISITANTE" ? "font-semibold" : ""}
+                                >
                                   {match.away.club_name}
                                 </span>
                               </p>
@@ -261,7 +283,9 @@ export default function ClassificacaoPage() {
                 <section className="overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
                   <div className="border-b border-neutral-200 px-5 py-4">
                     <h2 className="text-[16px] font-semibold">Ordem da tabela</h2>
-                    <p className="mt-0.5 text-[12px] text-neutral-500">Critérios de classificação, nesta ordem.</p>
+                    <p className="mt-0.5 text-[12px] text-neutral-500">
+                      Critérios de classificação, nesta ordem.
+                    </p>
                   </div>
                   <ol className="space-y-3 px-5 py-4">
                     {CRITERIA.map((criterion, index) => (
@@ -278,8 +302,8 @@ export default function ClassificacaoPage() {
             </div>
 
             <p className="mt-6 text-[12px] leading-5 text-neutral-500">
-              Classificação de 1 a {rows.length}, com os clubes sem partidas zerados. Pontos, saldo e posição
-              são calculados a cada consulta, nunca gravados.
+              Classificação de 1 a {rows.length}, com os clubes sem partidas zerados. Pontos, saldo
+              e posição são calculados a cada consulta, nunca gravados.
             </p>
           </>
         )}

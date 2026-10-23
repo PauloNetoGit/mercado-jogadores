@@ -61,9 +61,7 @@ export function Modal({
           <div>
             <h2 className="text-[15px] font-semibold">{title}</h2>
             {description && (
-              <p className="mt-1 text-[12px] leading-5 text-neutral-500">
-                {description}
-              </p>
+              <p className="mt-1 text-[12px] leading-5 text-neutral-500">{description}</p>
             )}
           </div>
           <button
@@ -83,11 +81,7 @@ export function Modal({
   );
 }
 
-export function ModalActions({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function ModalActions({ children }: { children: ReactNode }) {
   return <div className="mt-5 flex justify-end gap-2">{children}</div>;
 }
 

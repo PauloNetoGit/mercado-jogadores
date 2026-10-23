@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { BarChart3, CircleAlert, Info, Loader2, Lock, UserRound } from "lucide-react";
-import {
-  Modal,
-  btnPrimary,
-  btnSecondary,
-  inputClass,
-} from "@/src/components/Modal";
+import { Modal, btnPrimary, btnSecondary, inputClass } from "@/src/components/Modal";
 import { POSICOES, playersService, type DadosJogador } from "@/src/services/players";
 import { formatMoney } from "@/src/utils/format";
 import type { Jogador, Posicao } from "@/src/types";
@@ -24,9 +19,17 @@ const ATTRIBUTES: { key: keyof DadosJogador; label: string }[] = [
 ];
 
 const EMPTY: Form = {
-  name: "", position: "", age: "", agility: "",
-  pace: "", shooting: "", passing: "", dribbling: "",
-  defending: "", physical: "", potential: "",
+  name: "",
+  position: "",
+  age: "",
+  agility: "",
+  pace: "",
+  shooting: "",
+  passing: "",
+  dribbling: "",
+  defending: "",
+  physical: "",
+  potential: "",
 };
 
 function fromPlayer(player: Jogador): Form {
@@ -62,7 +65,11 @@ function FieldError({ message }: { message?: string }) {
 }
 
 /** Espelha as regras do backend (players.service.ts e DTOs). */
-function validate(form: Form, creating: boolean, currentAge?: number): Partial<Record<keyof DadosJogador | "form", string>> {
+function validate(
+  form: Form,
+  creating: boolean,
+  currentAge?: number,
+): Partial<Record<keyof DadosJogador | "form", string>> {
   const errors: Partial<Record<keyof DadosJogador | "form", string>> = {};
   const name = form.name.trim().replace(/\s+/g, " ");
 
@@ -79,7 +86,8 @@ function validate(form: Form, creating: boolean, currentAge?: number): Partial<R
 
   const agility = intIn(form.agility, 1, 100);
   if (agility === null) errors.agility = "De 1 a 100.";
-  else if (age !== null && age >= 35 && agility > 85) errors.agility = "Até 85 com 35 anos ou mais.";
+  else if (age !== null && age >= 35 && agility > 85)
+    errors.agility = "Até 85 com 35 anos ou mais.";
 
   if (!creating) return errors;
 
@@ -173,9 +181,17 @@ export function PlayerFormModal({
       width={760}
     >
       <div className="space-y-4">
-        <Field label="Nome" error={errors.name} hint="De 3 a 100 caracteres, com pelo menos duas palavras e sem números.">
+        <Field
+          label="Nome"
+          error={errors.name}
+          hint="De 3 a 100 caracteres, com pelo menos duas palavras e sem números."
+        >
           <div className="relative">
-            <UserRound size={14} strokeWidth={1.7} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+            <UserRound
+              size={14}
+              strokeWidth={1.7}
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+            />
             <input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
@@ -207,7 +223,9 @@ export function PlayerFormModal({
                   }`}
                 >
                   <span className="block text-[13px] font-semibold">{key}</span>
-                  <span className={`block text-[11px] ${selected ? "" : "text-neutral-500"}`}>{POSICOES[key]}</span>
+                  <span className={`block text-[11px] ${selected ? "" : "text-neutral-500"}`}>
+                    {POSICOES[key]}
+                  </span>
                 </button>
               );
             })}
@@ -215,7 +233,9 @@ export function PlayerFormModal({
           {errors.position ? (
             <FieldError message={errors.position} />
           ) : hasClub ? (
-            <p className="mt-1 text-[11px] text-neutral-500">Jogador com clube não muda de posição: as outras posições ficam desabilitadas.</p>
+            <p className="mt-1 text-[11px] text-neutral-500">
+              Jogador com clube não muda de posição: as outras posições ficam desabilitadas.
+            </p>
           ) : null}
         </div>
 
@@ -223,12 +243,28 @@ export function PlayerFormModal({
           <Field
             label="Idade"
             error={errors.age}
-            hint={creating ? "De 16 a 45 anos." : `De 16 a 45, sem diminuir (atual: ${player.age}).`}
+            hint={
+              creating ? "De 16 a 45 anos." : `De 16 a 45, sem diminuir (atual: ${player.age}).`
+            }
           >
-            <input inputMode="numeric" value={form.age} onChange={(e) => set("age", e.target.value)} className={inputClass} />
+            <input
+              inputMode="numeric"
+              value={form.age}
+              onChange={(e) => set("age", e.target.value)}
+              className={inputClass}
+            />
           </Field>
-          <Field label="Agilidade" error={errors.agility} hint="De 1 a 100 (até 85 com 35 anos ou mais).">
-            <input inputMode="numeric" value={form.agility} onChange={(e) => set("agility", e.target.value)} className={inputClass} />
+          <Field
+            label="Agilidade"
+            error={errors.agility}
+            hint="De 1 a 100 (até 85 com 35 anos ou mais)."
+          >
+            <input
+              inputMode="numeric"
+              value={form.agility}
+              onChange={(e) => set("agility", e.target.value)}
+              className={inputClass}
+            />
           </Field>
           {creating && (
             <Field label="Valor base (moedas)" hint="Calculado no cadastro.">
@@ -240,7 +276,8 @@ export function PlayerFormModal({
         {!creating && (
           <p className="flex items-center gap-2 rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-3 py-2.5 text-[12px] text-neutral-600">
             <Lock size={13} strokeWidth={1.7} className="shrink-0" />
-            Não mudam depois do cadastro: valor base ({formatMoney(player.base_value)}), indicadores e potencial.
+            Não mudam depois do cadastro: valor base ({formatMoney(player.base_value)}), indicadores
+            e potencial.
           </p>
         )}
 
@@ -256,11 +293,25 @@ export function PlayerFormModal({
               <div className="grid grid-cols-2 content-start gap-x-3 gap-y-3 sm:grid-cols-4">
                 {ATTRIBUTES.map(({ key, label }) => (
                   <Field key={key} label={label} error={errors[key]}>
-                    <input inputMode="numeric" value={form[key]} onChange={(e) => set(key, e.target.value)} className={inputClass} />
+                    <input
+                      inputMode="numeric"
+                      value={form[key]}
+                      onChange={(e) => set(key, e.target.value)}
+                      className={inputClass}
+                    />
                   </Field>
                 ))}
-                <Field label="Potencial" error={errors.potential} hint="≥ maior atributo; igual a ele com 33+ anos">
-                  <input inputMode="numeric" value={form.potential} onChange={(e) => set("potential", e.target.value)} className={inputClass} />
+                <Field
+                  label="Potencial"
+                  error={errors.potential}
+                  hint="≥ maior atributo; igual a ele com 33+ anos"
+                >
+                  <input
+                    inputMode="numeric"
+                    value={form.potential}
+                    onChange={(e) => set("potential", e.target.value)}
+                    className={inputClass}
+                  />
                 </Field>
                 <Field label="Overall" hint="Calculado automaticamente">
                   <Locked />
@@ -274,7 +325,10 @@ export function PlayerFormModal({
       </div>
 
       {(errors.form || serverError) && (
-        <p role="alert" className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700">
+        <p
+          role="alert"
+          className="mt-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700"
+        >
           <CircleAlert size={14} className="mt-0.5 shrink-0" />
           {errors.form || serverError}
         </p>
@@ -283,8 +337,7 @@ export function PlayerFormModal({
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4">
         {creating ? (
           <p className="flex items-center gap-1.5 text-[12px] text-neutral-500">
-            <Info size={13} strokeWidth={1.7} />
-            O jogador começa livre e Apto.
+            <Info size={13} strokeWidth={1.7} />O jogador começa livre e Apto.
           </p>
         ) : (
           <span />
@@ -316,7 +369,10 @@ function Locked({ text = "Após salvar" }: { text?: string }) {
 /** Prévia só dos valores digitados: não calcula overall nem valor base. */
 function AttributePreview({ form, potential }: { form: Form; potential: number | null }) {
   return (
-    <aside className="rounded-lg border border-neutral-200 bg-neutral-50 p-3" aria-label="Prévia dos atributos">
+    <aside
+      className="rounded-lg border border-neutral-200 bg-neutral-50 p-3"
+      aria-label="Prévia dos atributos"
+    >
       <p className="flex items-center gap-1.5 text-[12px] text-neutral-600">
         <BarChart3 size={13} strokeWidth={1.7} />
         Prévia dos atributos
@@ -329,10 +385,16 @@ function AttributePreview({ form, potential }: { form: Form; potential: number |
               <span className="w-[68px] shrink-0 text-neutral-600">{label}</span>
               <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-200/70">
                 {potential !== null && (
-                  <span className="absolute inset-y-0 left-0 rounded-full bg-[#155DFC]/20" style={{ width: `${potential}%` }} />
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-full bg-[#155DFC]/20"
+                    style={{ width: `${potential}%` }}
+                  />
                 )}
                 {value !== null && (
-                  <span className="absolute inset-y-0 left-0 rounded-full bg-[#155DFC]" style={{ width: `${value}%` }} />
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-full bg-[#155DFC]"
+                    style={{ width: `${value}%` }}
+                  />
                 )}
               </span>
               <span className="w-5 text-right font-medium tabular-nums">{value ?? "–"}</span>
@@ -341,8 +403,8 @@ function AttributePreview({ form, potential }: { form: Form; potential: number |
         })}
       </ul>
       <p className="mt-3 text-[11px] leading-4 text-neutral-500">
-        Faixa clara: até o potencial{potential !== null ? ` (${potential})` : ""}. A prévia só desenha os
-        valores digitados; não calcula overall nem valor base.
+        Faixa clara: até o potencial{potential !== null ? ` (${potential})` : ""}. A prévia só
+        desenha os valores digitados; não calcula overall nem valor base.
       </p>
     </aside>
   );
@@ -365,11 +427,13 @@ function Field({
       <div className="mt-1">{children}</div>
       {error ? (
         <span className="mt-1 flex items-start gap-1 text-[11px] font-normal leading-4 text-[#E7000B]">
-  <CircleAlert size={12} strokeWidth={2} className="mt-px shrink-0" />
-  {error}
-</span>
+          <CircleAlert size={12} strokeWidth={2} className="mt-px shrink-0" />
+          {error}
+        </span>
       ) : hint ? (
-        <span className="mt-1 block text-[11px] font-normal leading-4 text-neutral-500">{hint}</span>
+        <span className="mt-1 block text-[11px] font-normal leading-4 text-neutral-500">
+          {hint}
+        </span>
       ) : null}
     </label>
   );

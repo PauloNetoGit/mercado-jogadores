@@ -75,7 +75,13 @@ export function ErrorCard({
       title={`Não foi possível carregar ${what}`}
       description={message}
     >
-      <button type="button" onClick={onRetry} disabled={retrying} aria-busy={retrying} className={stateButtonClass}>
+      <button
+        type="button"
+        onClick={onRetry}
+        disabled={retrying}
+        aria-busy={retrying}
+        className={stateButtonClass}
+      >
         {retrying ? (
           <Loader2 size={14} className="animate-spin" />
         ) : (
@@ -90,7 +96,11 @@ export function ErrorCard({
 /** "◌ Carregando jogadores…" */
 export function LoadingLabel({ label }: { label: string }) {
   return (
-    <span role="status" aria-live="polite" className="flex items-center gap-2.5 text-[13px] text-neutral-600">
+    <span
+      role="status"
+      aria-live="polite"
+      className="flex items-center gap-2.5 text-[13px] text-neutral-600"
+    >
       <Loader2 size={15} strokeWidth={1.8} className="animate-spin text-neutral-500" />
       {label}
     </span>

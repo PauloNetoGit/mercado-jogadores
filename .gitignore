@@ -87,3 +87,4 @@ backend/.env
 # Arquivos temporarios de desenvolvimento
 *.bak
 *.tsbuildinfo
+*:Zone.Identifier

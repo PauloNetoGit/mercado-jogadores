@@ -34,10 +34,7 @@ import {
   describeLoadError,
   stateButtonClass,
 } from "@/src/components/ListStates";
-import {
-  LineupTab,
-  rememberSoldStarter,
-} from "@/src/components/clubs/LineupTab";
+import { LineupTab, rememberSoldStarter } from "@/src/components/clubs/LineupTab";
 import {
   SaleDoneModal,
   SellModal,
@@ -94,10 +91,7 @@ function ClubeDetalhePage({ id }: { id: number }) {
     if (!validId) return;
     let cancelled = false;
 
-    Promise.all([
-      clubsService.get(id),
-      clubsService.transactionsCount(id).catch(() => 0),
-    ])
+    Promise.all([clubsService.get(id), clubsService.transactionsCount(id).catch(() => 0)])
       .then(([detail, history]) => {
         if (cancelled) return;
         setClub(detail);
@@ -108,11 +102,7 @@ function ClubeDetalhePage({ id }: { id: number }) {
       .catch((err: unknown) => {
         if (cancelled) return;
         setClub(null);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Não foi possível carregar o clube.",
-        );
+        setError(err instanceof Error ? err.message : "Não foi possível carregar o clube.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -279,11 +269,7 @@ function ClubeDetalhePage({ id }: { id: number }) {
 
             <div role="tabpanel" className="mt-4">
               {tab === "elenco" && (
-                <Squad
-                  players={players}
-                  calculatedAt={loadedAt}
-                  onSell={setSellTarget}
-                />
+                <Squad players={players} calculatedAt={loadedAt} onSell={setSellTarget} />
               )}
               {tab === "escalacao" && (
                 <LineupTab
@@ -322,9 +308,7 @@ function ClubeDetalhePage({ id }: { id: number }) {
           onCancel={() => setSellTarget(null)}
           onSold={(result, wasStarter) => {
             if (wasStarter) rememberSoldStarter(id, sellTarget.name);
-            setSaleDone(
-              saleDoneFrom(result, sellTarget, club.name, wasStarter),
-            );
+            setSaleDone(saleDoneFrom(result, sellTarget, club.name, wasStarter));
             setSellTarget(null);
             refresh();
           }}
@@ -371,11 +355,7 @@ function StatCard({
       </div>
       <p className="mt-2 text-[24px] font-semibold leading-8 tracking-tight tabular-nums">
         {value}
-        {unit && (
-          <span className="ml-1.5 text-[13px] font-normal text-neutral-500">
-            {unit}
-          </span>
-        )}
+        {unit && <span className="ml-1.5 text-[13px] font-normal text-neutral-500">{unit}</span>}
       </p>
       <p className="mt-1 text-[12px] text-neutral-500">{hint}</p>
     </div>
@@ -412,9 +392,7 @@ function TabButton({
       {count !== undefined && (
         <span
           className={`rounded-md px-1.5 text-[11px] ${
-            active
-              ? "bg-[#155DFC]/10 text-[#155DFC]"
-              : "bg-neutral-100 text-neutral-600"
+            active ? "bg-[#155DFC]/10 text-[#155DFC]" : "bg-neutral-100 text-neutral-600"
           }`}
         >
           {count}
@@ -427,9 +405,7 @@ function TabButton({
 const TZ = "America/Sao_Paulo";
 
 function formatDate(iso: string) {
-  return new Intl.DateTimeFormat("pt-BR", { timeZone: TZ }).format(
-    new Date(iso),
-  );
+  return new Intl.DateTimeFormat("pt-BR", { timeZone: TZ }).format(new Date(iso));
 }
 
 function formatTime(iso: string) {
@@ -479,8 +455,8 @@ function Squad({
       <div className="px-4 pb-3 pt-4">
         <h2 className="text-[15px] font-semibold">Elenco</h2>
         <p className="mt-0.5 text-[12px] text-neutral-500">
-          Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo nome.
-          Contrato calculado para uma venda agora.
+          Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo nome. Contrato calculado para uma
+          venda agora.
         </p>
       </div>
 
@@ -539,9 +515,7 @@ function Squad({
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-[10px] font-semibold text-neutral-600">
                         {initials}
                       </span>
-                      <span className="whitespace-nowrap font-medium">
-                        {player.name}
-                      </span>
+                      <span className="whitespace-nowrap font-medium">{player.name}</span>
                     </div>
                   </td>
                   <td className="px-3 py-2.5">
@@ -584,9 +558,7 @@ function Squad({
                   </td>
                   <td className="px-3 py-2.5 text-right tabular-nums">
                     {contract
-                      ? new Intl.NumberFormat("pt-BR").format(
-                          contract.remaining_days ?? 0,
-                        )
+                      ? new Intl.NumberFormat("pt-BR").format(contract.remaining_days ?? 0)
                       : "—"}
                   </td>
                   <td className="px-3 py-2.5">
@@ -621,9 +593,9 @@ function Squad({
       </div>
 
       <p className="border-t border-neutral-200 px-4 py-3 text-[11px] text-neutral-500">
-        Valor de mercado, dias restantes e % de multa calculados para uma venda
-        agora{calculatedAt ? ` (${formatDateTime(calculatedAt)})` : ""}. A multa
-        tem teto de {formatMoney(TETO_MULTA)}.
+        Valor de mercado, dias restantes e % de multa calculados para uma venda agora
+        {calculatedAt ? ` (${formatDateTime(calculatedAt)})` : ""}. A multa tem teto de{" "}
+        {formatMoney(TETO_MULTA)}.
       </p>
     </div>
   );

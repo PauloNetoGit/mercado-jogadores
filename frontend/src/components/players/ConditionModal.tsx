@@ -105,7 +105,9 @@ export function ConditionModal({
                     </span>
                   )}
                 </span>
-                <span className={`mt-0.5 block text-[12px] leading-4 ${blocked ? "" : "text-neutral-500"}`}>
+                <span
+                  className={`mt-0.5 block text-[12px] leading-4 ${blocked ? "" : "text-neutral-500"}`}
+                >
                   {DESCRIPTIONS[key]}
                 </span>
                 {blocked && (
@@ -126,14 +128,18 @@ export function ConditionModal({
           <div>
             <p className="text-[13px] font-medium">{player.name} é titular</p>
             <p className="mt-0.5">
-              Ao passar a Doente, ele sai da escalação, e o {clubName ?? "clube"} só volta a jogar partidas depois de escalar de novo os 5 titulares.
+              Ao passar a Doente, ele sai da escalação, e o {clubName ?? "clube"} só volta a jogar
+              partidas depois de escalar de novo os 5 titulares.
             </p>
           </div>
         </div>
       )}
 
       {error && (
-        <p role="alert" className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700">
+        <p
+          role="alert"
+          className="mt-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700"
+        >
           <CircleAlert size={14} className="mt-0.5 shrink-0" />
           {error}
         </p>
@@ -144,7 +150,12 @@ export function ConditionModal({
         <button type="button" onClick={onClose} disabled={submitting} className={btnSecondary}>
           Cancelar
         </button>
-        <button type="button" onClick={submit} disabled={submitting || value === player.condition} className={btnPrimary}>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={submitting || value === player.condition}
+          className={btnPrimary}
+        >
           {submitting && <Loader2 size={14} className="animate-spin" />}
           Salvar condição
         </button>

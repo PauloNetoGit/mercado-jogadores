@@ -175,7 +175,9 @@ export default function PartidasPage() {
               <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
                 <div>
                   <h2 className="text-[15px] font-semibold">Histórico de partidas</h2>
-                  <p className="mt-0.5 text-[12px] text-neutral-500">Da mais recente para a mais antiga.</p>
+                  <p className="mt-0.5 text-[12px] text-neutral-500">
+                    Da mais recente para a mais antiga.
+                  </p>
                 </div>
 
                 <div className="relative inline-flex h-9 min-w-[200px] items-center gap-2 rounded-lg border border-neutral-300 bg-white pl-3 pr-2.5 text-[13px] shadow-sm focus-within:ring-2 focus-within:ring-[#155DFC]/25">
@@ -215,7 +217,10 @@ export default function PartidasPage() {
                   <tbody>
                     {visible.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-5 py-10 text-center text-[13px] text-neutral-500">
+                        <td
+                          colSpan={6}
+                          className="px-5 py-10 text-center text-[13px] text-neutral-500"
+                        >
                           Este clube ainda não jogou nenhuma partida.
                         </td>
                       </tr>
@@ -224,7 +229,9 @@ export default function PartidasPage() {
                         <tr key={match.id} className="border-b border-neutral-200">
                           <td className="whitespace-nowrap px-5 py-3.5 tabular-nums">
                             {formatMatchDate(match.played_at)}{" "}
-                            <span className="ml-1 text-neutral-500">{formatMatchTime(match.played_at)}</span>
+                            <span className="ml-1 text-neutral-500">
+                              {formatMatchTime(match.played_at)}
+                            </span>
                           </td>
                           <td className="px-3 py-3.5">
                             <div className="flex items-center justify-end gap-2">
@@ -270,7 +277,8 @@ export default function PartidasPage() {
             </section>
 
             <p className="mt-5 text-[12px] leading-5 text-neutral-500">
-              Partidas da mais recente para a mais antiga, com filtro por clube. “Ver duelos” abre a partida.
+              Partidas da mais recente para a mais antiga, com filtro por clube. “Ver duelos” abre a
+              partida.
             </p>
           </>
         )}
